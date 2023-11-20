@@ -5,7 +5,8 @@ date: "2023-11-07"
 output:
   html_document:
     number_sections: yes
-    highlight: kate
+    theme: flatly  # journal flatly spacelab cosmo
+    highlight: tango
     toc : yes
     toc_float:
       collapsed: true
@@ -22,15 +23,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Data Understanding eu
 
-This is  maria1 an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+The data understanding phase of CRISP-DM involves taking a closer look at the data available for mining. This step is critical in avoiding unexpected problems during the next phase, data preparation, which is typically the longest part of a project.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+Data understanding involves accessing the data and exploring it using tables and graphics. This enables you to determine the quality of the data and describe the results of these steps in the project documentation.
 
 ```{r cars}
 summary(cars)
 ```
 
-## Summarizing and visualizing the data
+## Data Summarizing
+
+The term Data Summarizing can be defined as the presentation of a summary/report of generated data in a comprehensible and informative manner.Data summarizing is typically numerical, visual or a combination of the two. It is a key skill in data analysis - we use it to provide insights both to others and to ourselves. 
+
+## Data Visualizing
+
+Data visualization is the representation of data through use of common graphics, such as charts, plots, infographics, and even animations. These visual displays of information communicate complex data relationships and data-driven insights in a way that is easy to understand.
 
 # Data Preparation monica
 
