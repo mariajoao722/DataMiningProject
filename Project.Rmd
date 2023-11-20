@@ -18,7 +18,18 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+
+library(readr)
+library(dplyr)
+
+# Load or create the loan_dev dataset
+loan_dev <- read_delim("loan_dev.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
 ```
 
 # Data Understanding eu
@@ -34,6 +45,15 @@ summary(cars)
 ## Data Summarizing
 
 The term Data Summarizing can be defined as the presentation of a summary/report of generated data in a comprehensible and informative manner.Data summarizing is typically numerical, visual or a combination of the two. It is a key skill in data analysis - we use it to provide insights both to others and to ourselves. 
+
+
+Nesta linha de código vemos o número de empréstimos em que o contrato acabou sem problemas ("1") e aqueles em que o contrato acabou ou o empréstimo ainda não foi pago.
+
+```{r loan_dev}
+loan_dev %>%
+     group_by(status) %>%
+     count()
+```
 
 ## Data Visualizing
 
