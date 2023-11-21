@@ -41,7 +41,37 @@ summary(cars)
 
 # Data Preparation monica
 
-## Data quality and pre-processing
+Data cleaning:
+
+- [ ]  Handle missing values;
+- [ ]  Duplicate records;
+- [ ]  errors in the data;
+
+Data transformation:
+
+- [ ]  Feature engineering;
+- [ ]  Scaling
+- [ ]  Encoding categoriacal variables
+- [ ]  Date and time parsing
+- [ ]  text data processing
+
+Handling Imbalanced Data:
+
+- [ ] Oversampling...;
+
+Data splitting:
+
+- [ ] split data into training and test
+
+## Data quality
+
+### Noise and outliers
+
+??
+
+### Missing values
+
+
 
 # Descriptive Modelling monica
 
