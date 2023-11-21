@@ -23,7 +23,7 @@ knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE
 )
-````
+```
 
 <!-- load packagers -->
 <!-- include = false is for Hiding the code and the output in final file-->
@@ -40,6 +40,9 @@ library(dplyr)
 # Load or create the loan_dev dataset
 loan_dev <- read_delim("loan_dev.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
+
+disp <- read_delim("disp.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
 ```
 
 # Data Understanding eu
@@ -48,9 +51,6 @@ The data understanding phase of CRISP-DM involves taking a closer look at the da
 
 Data understanding involves accessing the data and exploring it using tables and graphics. This enables you to determine the quality of the data and describe the results of these steps in the project documentation.
 
-```{r cars}
-summary(cars)
-```
 
 ## Data Summarizing
 
@@ -59,10 +59,23 @@ The term Data Summarizing can be defined as the presentation of a summary/report
 
 Nesta linha de código vemos o número de empréstimos em que o contrato acabou sem problemas ("1") e aqueles em que o contrato acabou ou o empréstimo ainda não foi pago.
 
-```{r loan_dev}
+```{r}
 loan_dev %>%
      group_by(status) %>%
      count()
+```
+
+Para juntar a informação  do estado dos empréstimos com o id do cliente foi preciso dar merge a dois datasets, mas para não juntar colunas desnecessárias primeiro escolhemos as colunas necesárias.
+
+```{r}
+selected_columns <- loan_dev %>%
+    select(account_id, status)
+```
+
+Após selecionar as colunas vamos dar merge do novo dataset criado com o dataset disp.
+
+```{r}
+merge_loan_disp <- merge(selected_columns, disp, by = "account_id")
 ```
 
 ## Data Visualizing
@@ -80,7 +93,7 @@ Data transformation:
 
 - [ ]  Feature engineering;
 - [ ]  Scaling
-- [ ]  Encoding categoriacal variables
+- [ ]  Encoding categorical variables
 - [ ]  Date and time parsing
 - [ ]  text data processing
 
