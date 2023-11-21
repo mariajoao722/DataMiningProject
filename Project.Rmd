@@ -19,6 +19,13 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+<!-- load packagers -->
+<!-- include = false is for Hiding the code and the output in final file-->
+```{r, include = FALSE}
+library(tidyverse)
+library(tidymodels)
+
+```
 
 # Data Understanding Maria
 
