@@ -32,20 +32,24 @@ library(tidyverse)
 library(tidymodels)
 library(readr)
 library(dplyr)
+library(ggplot2)
 
 ```
 
 <!-- load the databases -->
-```{r}
+```{r, include = FALSE}
 # Load or create the loan_dev dataset
 loan_dev <- read_delim("loan_dev.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
 
 disp <- read_delim("disp.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
+
+trans_dev <- read_delim("trans_dev.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
 ```
 
-# Data Understanding eu
+# Data Understanding Maria
 
 The data understanding phase of CRISP-DM involves taking a closer look at the data available for mining. This step is critical in avoiding unexpected problems during the next phase, data preparation, which is typically the longest part of a project.
 
@@ -80,9 +84,17 @@ merge_loan_disp <- merge(selected_columns, disp, by = "account_id")
 
 ## Data Visualizing
 
-Data visualization is the representation of data through use of common graphics, such as charts, plots, infographics, and even animations. These visual displays of information communicate complex data relationships and data-driven insights in a way that is easy to understand.
+Data visualization is the representation of data through use of common graphics, such as charts and plots. These visual displays of information communicate complex data relationships and data-driven insights in a way that is easy to understand.
 
-# Data Preparation monica
+Mostra a distribuição das transações pelo tipo de operação 
+
+```{r}
+ggplot(trans_dev, aes(x = operation)) + geom_bar() + ggtitle("Distribution of transactions across operation") + theme(legend.text = element_text(size = 5))
+```
+
+
+
+# Data Preparation Mónica
 Data cleaning:
 
 - [ ]  Handle missing values;
@@ -114,7 +126,7 @@ Data splitting:
 ### Missing values
 
 
-# Descriptive Modelling monica
+# Descriptive Modelling Mónica
 
 # Predictive Modelling Maria
 
