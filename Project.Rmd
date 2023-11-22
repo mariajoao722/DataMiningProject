@@ -47,6 +47,9 @@ disp <- read_delim("disp.csv", delim = ";",
 
 trans_dev <- read_delim("trans_dev.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
+
+account <- read_delim("account.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
 ```
 
 # Data Understanding Maria
