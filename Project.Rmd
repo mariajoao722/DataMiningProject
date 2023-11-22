@@ -43,6 +43,9 @@ loan_dev <- read_delim("loan_dev.csv", delim = ";",
 
 disp <- read_delim("disp.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
+
+trans_dev <- read_delim("trans_dev.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
 ```
 
 # Data Understanding eu
@@ -109,14 +112,49 @@ Data splitting:
 
 ### Noise and outliers
 
-??
+?? valores impossiveis para o contexto, box plot
 
 ### Missing values
 
+For load_dev:
+
+what type of missing value:
+````{r}
+datasets <- list (loan_dev, account, trans_dev)
+names <- list("loan_dev", "account", "trans_dev")
+names_i <- 1
+
+for (i in seq_along(datasets)){
+  
+  dataset <- datasets[[i]]
+
+  numeroNa <- dataset %>%
+      summarise_all(~sum(is.na(.)))
+  
+  if(sum(numeroNa) > 0){
+    cat("Missing values in", names[[names_i]], "dataset:\n\n")
+    for (col_name in names(numeroNa)) {
+      cat(col_name, ": ",  sprintf("%.1f%%", numeroNa[[col_name]]/ length(dataset[[col_name]])*100), "\n")
+    }
+    
+  } else {
+   cat("No missing values in", names[[names_i]], "dataset\n")
+  }
+  names_i <- i + 1
+}
+
+
+````
+* Remove the properties with more than 70% missing values
+
+````{r}
+
+
+````
 
 # Descriptive Modelling monica
 
-# Predictive Modelling Maria
+# Predictive Modelling Maria .
 
 ## Including Plots
 
