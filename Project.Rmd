@@ -50,6 +50,16 @@ trans_dev <- read_delim("trans_dev.csv", delim = ";",
 
 account <- read_delim("account.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
+
+card_dev <- read_delim("card_dev.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+client <- read_delim("client.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+district <- read_delim("district.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
 ```
 
 # Data Understanding Maria
@@ -128,12 +138,10 @@ Data splitting:
 
 ### Missing values
 
-For load_dev:
-
-what type of missing value:
+Analysis of missing value in propertys:
 ````{r}
-datasets <- list (loan_dev, account, trans_dev)
-names <- list("loan_dev", "account", "trans_dev")
+datasets <- list (account, card_dev, client, disp, district, loan_dev, trans_dev)
+names <- list("account", "card", "client", "disposition", "district", "loan", "transaction")
 names_i <- 1
 
 for (i in seq_along(datasets)){
@@ -144,20 +152,26 @@ for (i in seq_along(datasets)){
       summarise_all(~sum(is.na(.)))
   
   if(sum(numeroNa) > 0){
-    cat("Missing values in", names[[names_i]], "dataset:\n\n")
+    cat("Missing values in", names[[names_i]], "dataset:\n")
     for (col_name in names(numeroNa)) {
-      cat(col_name, ": ",  sprintf("%.1f%%", numeroNa[[col_name]]/ length(dataset[[col_name]])*100), "\n")
+      cat("  ",col_name, ": ",  sprintf("%.1f%%", numeroNa[[col_name]]/ length(dataset[[col_name]])*100))
+      if(numeroNa[[col_name]]/ length(dataset[[col_name]])*100 > 70){
+        cat("  ", "** Remove", col_name, "property **\n")
+        dataset <- subset(dataset, select = -get(col_name))
+        datasets[[i]] <- dataset
+      } else{
+        cat("\n")
+      }
     }
-    
+    cat("\n")
   } else {
    cat("No missing values in", names[[names_i]], "dataset\n")
   }
   names_i <- i + 1
 }
 
-
 ````
-* Remove the properties with more than 70% missing values
+\* Remove the properties with more than 70% missing values
 
 ````{r}
 
