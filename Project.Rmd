@@ -69,6 +69,10 @@ The data understanding phase of CRISP-DM involves taking a closer look at the da
 Data understanding involves accessing the data and exploring it using tables and graphics. This enables you to determine the quality of the data and describe the results of these steps in the project documentation.
 
 
+trans_dev account final n interessa, bank, k_symbol posso apagar
+
+na data do loan ver a ultima transação feita e podemos eliminar anteriores
+
 ## Data Summarizing
 
 The term Data Summarizing can be defined as the presentation of a summary/report of generated data in a comprehensible and informative manner.Data summarizing is typically numerical, visual or a combination of the two. It is a key skill in data analysis - we use it to provide insights both to others and to ourselves. 
