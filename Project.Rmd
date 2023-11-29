@@ -115,7 +115,7 @@ ggplot(trans_dev, aes(x = operation)) + geom_bar() + ggtitle("Distribution of tr
 Data cleaning:
 
 - [X]  Handle missing values;
-- [ ]  Duplicate records;
+- [x]  Duplicate records;
 - [ ]  errors in the data;
 
 Data transformation:
@@ -144,7 +144,7 @@ Nota: Na conversão da data foi utilizada a adição do século '19' para garant
 ````{r}
 
 account$account_id <- as.integer(account$account_id)
-account$district_id <- as.integer(account$district_id)
+account$district_id <- as.factor(account$district_id)
 account$frequency <- as.factor(account$frequency)
 if(!inherits(account$date, "Date")){
   account$date <- as.Date(sprintf("%s%s", "19", account$date), format="%Y%m%d")
@@ -153,6 +153,8 @@ if(!inherits(account$date, "Date")){
 save(account, file="Rdata/account.Rdata")
 #load()
 str(account)
+cat("\n")
+summary(account)
 
 `````
 
@@ -165,6 +167,8 @@ if(!inherits(card_dev$issued, "Date")){
   card_dev$issued <- as.Date(sprintf("%s%s", "19", card_dev$issued), format="%Y%m%d")
 }
 str(card_dev)
+cat("\n")
+summary(card_dev)
 
 save(card_dev, file="Rdata/card_dev.Rdata")
 
@@ -173,9 +177,11 @@ save(card_dev, file="Rdata/card_dev.Rdata")
 ````{r}
 client$client_id <- as.integer(client$client_id)
 client$birth_number <- as.integer(client$birth_number)
-client$district_id <- as.integer(client$district_id)
+client$district_id <- as.factor(client$district_id)
 
 str(client)
+cat("\n")
+summary(client)
 
 save(client, file="Rdata/client.Rdata")
 
@@ -188,7 +194,10 @@ disp$client_id <- as.integer(disp$client_id)
 disp$account_id <- as.integer(disp$account_id)
 disp$type <- as.factor(disp$type)
 
+
 str(disp)
+cat("\n")
+summary(disp)
 
 save(disp, file="Rdata/disp.Rdata")
 
@@ -196,6 +205,7 @@ save(disp, file="Rdata/disp.Rdata")
 
 ````{r}
 district$code <- as.integer(district$code)
+district$region <- as.factor(district$region)
 district$`no. of inhabitants` <- as.integer(district$`no. of inhabitants`)
 district$`no. of municipalities with inhabitants < 499` <- as.integer(district$`no. of municipalities with inhabitants < 499`)
 district$`no. of municipalities with inhabitants 500-1999` <- as.integer(district$`no. of municipalities with inhabitants 500-1999`)
@@ -208,6 +218,8 @@ district$`no. of commited crimes '95` <- as.numeric(district$`no. of commited cr
 district$`no. of commited crimes '96` <- as.numeric(district$`no. of commited crimes '96`)
 
 str(district)
+cat("\n")
+summary(district)
 save(district, file="Rdata/district.Rdata")
 `````
 
@@ -221,6 +233,8 @@ if(!inherits(loan_dev$date, "Date")){
 loan_dev$status <- as.factor(loan_dev$status)
 
 str(loan_dev)
+cat("\n")
+summary(loan_dev)
 
 save(loan_dev, file="Rdata/loan_dev.Rdata")
 `````
@@ -236,6 +250,8 @@ trans_dev$k_symbol <- as.factor(trans_dev$k_symbol)
 trans_dev$account <- as.integer(trans_dev$account)
 
 str(trans_dev)
+cat("\n")
+summary(trans_dev)
 save(trans_dev, file="Rdata/trans_dev.Rdata")
 ````
 
@@ -372,6 +388,61 @@ district_transform$`no. of commited crimes '95` <- ifelse(is.na(district$`no. of
                              round(mean(district$`no. of commited crimes '95`, na.rm = TRUE), 0),
                              district$`no. of commited crimes '95`
                              )
+````
+
+## Duplicate Values
+
+````{r}
+datasets <- list (account, card_dev, client, disp, district, loan_dev, trans_dev)
+names <- list("account", "card_dev", "client", "disp", "district", "loan_dev", "trans_dev")
+
+for (i in seq_along(datasets)){
+  
+  dataset <- datasets[[i]]
+
+  duplicate_rows <- dataset[duplicated(dataset), ]
+  
+  if(sum(duplicate_rows) > 0){
+    cat(sum(duplicate_rows), "duplicat values in", names[[i]], "dataset\n")
+    
+  } else {
+   cat("No duplicate values in", names[[i]], "dataset\n")
+  }
+  new_dataset_name <- paste(names[[i]], "_transform", sep = "")
+  assign(new_dataset_name, dataset)
+  
+}
+rm(datasets)
+rm(names)
+
+include_columns <- c("account_id")
+duplicate_rows <-  account[duplicated(account[, include_columns]), ]
+print(sum(duplicate_rows))
+
+include_columns <- c("card_id", "disp_id")
+duplicate_rows <-  card_dev[duplicated(card_dev[, include_columns]), ]
+print(sum(duplicate_rows))
+
+include_columns <- c("client_id", "district_id")
+duplicate_rows <-  client[duplicated(client[, include_columns]), ]
+print(sum(duplicate_rows))
+
+include_columns <- c("code", "name", "region")
+duplicate_rows <- district[duplicated(district[, include_columns]), ]
+print(sum(duplicate_rows))
+
+
+````
+## Handle errors in data
+
+
+````{r}
+account$account_id <- as.integer(account$account_id)
+account$district_id <- as.factor(account$district_id)
+str(account)
+summary(account)
+boxplot(account$date)
+hist(account$date, breaks = "months", xlab="Date by months", ylab = "density", main = "Histogram of dates")
 ````
 
 
