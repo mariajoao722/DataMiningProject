@@ -26,7 +26,9 @@ knitr::opts_chunk$set(
 ```
 
 <!-- load packagers -->
+
 <!-- include = false is for Hiding the code and the output in final file-->
+
 ```{r, include = FALSE}
 library(tidyverse)
 library(tidymodels)
@@ -38,6 +40,7 @@ library(rpart.plot)
 ```
 
 <!-- load the databases -->
+
 ```{r, include = FALSE}
 # Load or create the loan_dev dataset
 loan_dev <- read_delim("loan_dev.csv", delim = ";", 
@@ -68,7 +71,6 @@ district <- read_delim("district.csv", delim = ";",
 Data Understanding é uma fase crucial do processo de análise de dados. Envolve a obtenção de conhecimentos sobre a natureza, estrutura, conteúdo e qualidade de um conjunto de dados. O objetivo da compreensão dos dados é familiarizar-se com os dados, identificar potenciais problemas e lançar as bases para as fases subsequentes da análise de dados.
 
 Data Understanding envolve o acesso aos dados e a sua exploração através de tabelas e gráficos. Isto permite-lhe determinar a qualidade dos dados e descrever os resultados destes passos na documentação do projeto.
-
 
 ## Loan_dev
 
@@ -101,7 +103,6 @@ summary(loan_dev)
 
 Do output obtido retiramos que os loans registados vão desde 1993 até 1996, a duração mínima é de 12 meses e a máxima é de 60 meses. Este output é importante para termos um percessão geral da duração dos loans e em altura estes foram pedidos.
 
-
 ```{r}
 # Correlation matrix
 cor(loan_dev[c("amount", "duration", "payments")])
@@ -109,19 +110,19 @@ cor(loan_dev[c("amount", "duration", "payments")])
 
 A matriz de correlação mostra as correlações par a par entre as variáveis "amount", "duration" e "payments" no conjunto de dados loan_dev. Do output podemos retirar:
 
-- Amount vs. Duration:
+-   Amount vs. Duration:
 
 Coeficiente de correlação = 0.5932
 
 Há uma correlação positiva moderada entre o valor do empréstimo e a duração do empréstimo. Isto sugere que, em média, montantes de empréstimo maiores estão associados a durações mais longas.
 
-- Amount vs. Payments:
+-   Amount vs. Payments:
 
 Coeficiente de correlação = 0.6662
 
 Existe uma forte correlação positiva entre o montante do empréstimo e os pagamentos mensais. Isto indica que montantes de empréstimo maiores estão associados a pagamentos mensais mais elevados.
 
-- Duration vs. Payments:
+-   Duration vs. Payments:
 
 Coeficiente de correlaçãot = -0.0961
 
@@ -152,9 +153,7 @@ ggplot(loan_dev, aes(x = date)) +
 
 ```
 
-
-
-Para juntar a informação  do estado dos empréstimos com o id do cliente foi preciso dar merge a dois datasets, mas para não juntar colunas desnecessárias primeiro escolhemos as colunas necesárias.
+Para juntar a informação do estado dos empréstimos com o id do cliente foi preciso dar merge a dois datasets, mas para não juntar colunas desnecessárias primeiro escolhemos as colunas necesárias.
 
 ```{r}
 selected_columns <- loan_dev %>%
@@ -177,9 +176,8 @@ De sequida iremos ter uma visão geral sobre as estatísticas do dataset trans_d
 # Summary statistics
 summary(trans_dev)
 ```
-Do summary podems concluír que este dataset tem atributos categóricos e numéricos, sendo que dos numéricos retiramos que as transações registados começaram a 01/01/1993 e acabaram a 31/12/1996.
-Observamos também que o balance tem como mínimos um valor negativo o que será importante para os próximos passos. Retiramos também que a coluna  account tem um valor elevado de missing values, estes teram de ser tratados nos próximos passos.
 
+Do summary podems concluír que este dataset tem atributos categóricos e numéricos, sendo que dos numéricos retiramos que as transações registados começaram a 01/01/1993 e acabaram a 31/12/1996. Observamos também que o balance tem como mínimos um valor negativo o que será importante para os próximos passos. Retiramos também que a coluna account tem um valor elevado de missing values, estes teram de ser tratados nos próximos passos.
 
 Distribuíção do tipo de transação. Observámos que existem 3 tipos de transações.
 
@@ -187,15 +185,13 @@ Distribuíção do tipo de transação. Observámos que existem 3 tipos de trans
 ggplot(trans_dev, aes(x = type)) + geom_bar() +labs(title = "Transaction Type Distribution", x = "Transaction Type", y = "Count")
 ```
 
-
-Mostra a distribuição das transações pelo tipo de operação 
+Mostra a distribuição das transações pelo tipo de operação
 
 ```{r}
 ggplot(trans_dev, aes(x = operation)) + geom_bar() + ggtitle("Distribution of transactions across operation") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 No output oberservamos um valor elevado de NA, nos próximos passo será necessário o tratamente deste missing values.
-
 
 ## Account Dataset
 
@@ -222,7 +218,7 @@ summary(account)
 
 Este dataset tem infromações desde 01/01/1993 até 29/12/1997.
 
-Distribuição da frequência 
+Distribuição da frequência
 
 ```{r}
 # Create a bar plot to visualize the distribution
@@ -262,7 +258,6 @@ ggplot(card_dev, aes(x = type, fill = type)) +
 ```
 
 O tipo classic é o tipo com mais quantidade dos 3 tipos.
-
 
 Emissão de diferentes tipos de cartões ao longo do tempo grafico linear para cenas com tempo
 
@@ -310,8 +305,7 @@ print(head(district_summary))
 print(tail(district_summary))
 ```
 
-O distrito com o maior numero de contas é o distrito nº1  e o distrito com o menos número de contas é o dsitrito nº20 e distrito nº24
-
+O distrito com o maior numero de contas é o distrito nº1 e o distrito com o menos número de contas é o dsitrito nº20 e distrito nº24
 
 ```{r}
 # Calculate age from birth_number (assuming birth_number is in the format YYMMDD)
@@ -320,8 +314,8 @@ client$birth_year <- as.numeric(substr(client$birth_number, 1, 2))
 client$age <- 2023 - (1900 + client$birth_year)  # Adjust for the two-digit year
 ```
 
-
 Calcular a idade do cliente quando fez o loan
+
 ```{r}
 selected_columns1 <- merge_loan_disp %>%
     select(client_id,date,status)
@@ -337,8 +331,7 @@ merge_loan_client$loan_year <- as.numeric(substr(merge_loan_client$date, 1, 2))
 merge_loan_client$age <- (1900 + merge_loan_client$loan_year) - (1900 + merge_loan_client$birth_year)  # Adjust for the two-digit year
 ```
 
-
-##  DISTRIC
+## DISTRIC
 
 Distribuição da população pelas diferentes regiões.
 
@@ -352,6 +345,7 @@ ggplot(district, aes(x = name, y = `no. of inhabitants`, fill = region)) +
 ```
 
 Média salarial das diferentes regiões
+
 ```{r}
 # Create a boxplot
 ggplot(district, aes(x = region, y = `average salary`, fill = region)) +
@@ -361,12 +355,10 @@ ggplot(district, aes(x = region, y = `average salary`, fill = region)) +
   scale_fill_brewer(palette = "Set3")  # Choose a color palette
 ```
 
-
 Prague aparece como uma linha só, pois no dataset esta região tem apenas um valor atribuído enquanto as outras regiões tÊm vários valores atribuídos. Observamos que para além de Prague, Central Bohemia é a região com maior média salarial, mas o intervalo salarial é maior que as outras regiões. Nas regiões South Bohemia, South Moravia e West Bohemia existem alguns outliers, este podem ser erros dos dados ou podem significar que em alguns casos nestas regiões existem habitantes a ganhar mais do que a média salarial.
 
-
-
 Criminalidade em 1996
+
 ```{r}
 ggplot(district, aes(x = region, y = `no. of commited crimes '96`, fill = region)) +
     geom_bar(stat = "summary", fun = "sum", position = "dodge") +
@@ -376,6 +368,7 @@ ggplot(district, aes(x = region, y = `no. of commited crimes '96`, fill = region
 ```
 
 Criminalidade em 1995
+
 ```{r}
 # Create a bar chart for crimes in 1995
 ggplot(district, aes(x = region, y = `no. of commited crimes '95`, fill = region)) +
@@ -387,7 +380,6 @@ ggplot(district, aes(x = region, y = `no. of commited crimes '95`, fill = region
 
 Dos dois últimos gráfico retiramos que Prague é a maior região com criminalidade, mas em contra partida também é a região com o maior número de habitantes.
 
- 
 # Predictive Modelling
 
 DECISION TREES
@@ -396,7 +388,6 @@ DECISION TREES
 selected_columns2 <- merge_loan_client %>%
      select(client_id,age,status,district_id)
 ```
-
 
 ```{r}
 model_rt <- decision_tree(mode = "regression", engine = "rpart") 
@@ -409,4 +400,3 @@ rt_fit %>%
 
 vip(rt_fit)
 ```
-

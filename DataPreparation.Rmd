@@ -1,0 +1,554 @@
+---
+title: "DataPreparation"
+author: "Maria Pais, Mónica Araújo"
+date: "2023-11-07"
+output:
+  html_document:
+    number_sections: yes
+    theme: flatly  # journal flatly spacelab cosmo
+    highlight: tango
+    toc : yes
+    toc_float:
+      collapsed: true
+      smoth_scroll: true
+  word_document: 
+    toc :yes
+  pdf_document:
+    toc : yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+<!-- load packagers -->
+<!-- include = false is for Hiding the code and the output in final file-->
+```{r, include = FALSE}
+library(tidyverse)
+library(tidymodels)
+library(readr)
+library(dplyr)
+library(ggplot2)
+#install.packages("caret")
+library(caret)
+```
+
+<!-- load the databases -->
+```{r, include = FALSE}
+# Load or create the loan_dev dataset
+loan_dev <- read_delim("loan_dev.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+disp <- read_delim("disp.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+trans_dev <- read_delim("trans_dev.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+account <- read_delim("account.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+card_dev <- read_delim("card_dev.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+client <- read_delim("client.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+district <- read_delim("district.csv", delim = ";", 
+    escape_double = FALSE, trim_ws = TRUE)
+
+```
+
+
+# Data Preparation Mónica
+Data cleaning:
+
+- [x]  Handle missing values;
+- [x]  Duplicate records;
+- [x]  errors in the data;
+
+Data transformation:
+
+- [ ]  Feature engineering;
+- [ ]  Scaling
+- [x]  Encoding categorical variables
+- [x]  Date and time parsing
+- [ ]  text data processing
+
+Handling Imbalanced Data:
+
+- [ ] Oversampling...;
+
+Data splitting:
+
+- [ ] split data into training and test
+
+## Conversão do tipo de dados (Data Structure) 
+
+Conversão do tipos de dados, garantindo a consistência e adequação dos tipos de dados para análises e visualizações e facilitando operações específicas, como ordenação e filtragem.
+
+Nota: Na conversão da data foi utilizada a adição do século '19' para garantir a interpretação correta do ano.
+
+
+````{r}
+
+account$account_id <- as.integer(account$account_id)
+account$district_id <- as.factor(account$district_id)
+account$frequency <- as.factor(account$frequency)
+if(!inherits(account$date, "Date")){
+  account$date <- as.Date(sprintf("%s%s", "19", account$date), format="%Y%m%d")
+}
+
+#load()
+str(account)
+cat("\n")
+summary(account)
+
+`````
+
+````{r}
+
+card_dev$card_id <- as.integer(card_dev$card_id)
+card_dev$disp_id <- as.integer(card_dev$disp_id)
+card_dev$type <- as.factor(card_dev$type)
+if(!inherits(card_dev$issued, "Date")){
+  card_dev$issued <- as.Date(sprintf("%s%s", "19", card_dev$issued), format="%Y%m%d")
+}
+str(card_dev)
+cat("\n")
+summary(card_dev)
+
+save(card_dev, file="Rdata/card_dev.Rdata")
+
+`````
+
+````{r}
+client$client_id <- as.integer(client$client_id)
+client$birth_number <- as.integer(client$birth_number)
+client$district_id <- as.factor(client$district_id)
+
+str(client)
+cat("\n")
+summary(client)
+
+save(client, file="Rdata/client.Rdata")
+
+`````
+
+
+````{r}
+disp$disp_id <- as.integer(disp$disp_id)
+disp$client_id <- as.integer(disp$client_id)
+disp$account_id <- as.integer(disp$account_id)
+disp$type <- as.factor(disp$type)
+
+
+str(disp)
+cat("\n")
+summary(disp)
+
+save(disp, file="Rdata/disp.Rdata")
+
+`````
+
+````{r}
+district$code <- as.integer(district$code)
+district$region <- as.factor(district$region)
+district$`no. of inhabitants` <- as.integer(district$`no. of inhabitants`)
+district$`no. of municipalities with inhabitants < 499` <- as.integer(district$`no. of municipalities with inhabitants < 499`)
+district$`no. of municipalities with inhabitants 500-1999` <- as.integer(district$`no. of municipalities with inhabitants 500-1999`)
+district$`no. of municipalities with inhabitants 2000-9999` <- as.integer(district$`no. of municipalities with inhabitants 2000-9999`)
+district$`no. of municipalities with inhabitants >10000` <- as.integer(district$`no. of municipalities with inhabitants >10000`)
+district$`no. of cities` <- as.integer(district$`no. of cities`)
+district$`unemploymant rate '95` <- as.numeric(district$`unemploymant rate '95`)
+district$`unemploymant rate '96` <- as.numeric(district$`unemploymant rate '96`)
+district$`no. of commited crimes '95` <- as.numeric(district$`no. of commited crimes '95`)
+district$`no. of commited crimes '96` <- as.numeric(district$`no. of commited crimes '96`)
+
+district_name <- district %>%
+  select(code, name)
+
+district <- select(district, -name)
+
+str(district)
+cat("\n")
+summary(district)
+save(district, file="Rdata/district.Rdata")
+`````
+
+````{r}
+loan_dev$loan_id <- as.integer(loan_dev$loan_id)
+loan_dev$account_id <- as.integer(loan_dev$account_id)
+
+if(!inherits(loan_dev$date, "Date")){
+  loan_dev$date <- as.Date(sprintf("%s%s", "19", loan_dev$date), format="%Y%m%d")
+}
+loan_dev$status <- as.factor(loan_dev$status)
+
+str(loan_dev)
+cat("\n")
+summary(loan_dev)
+
+save(loan_dev, file="Rdata/loan_dev.Rdata")
+`````
+
+````{r}
+trans_dev$trans_id <- as.integer(trans_dev$trans_id)
+trans_dev$account_id <- as.integer(trans_dev$account_id)
+if(!inherits(trans_dev$date, "Date")){
+  trans_dev$date <- as.Date(sprintf("%s%s", "19", trans_dev$date), format="%Y%m%d")
+}
+trans_dev$type <- as.factor(trans_dev$type)
+trans_dev$operation <- as.factor(trans_dev$operation)
+trans_dev$k_symbol <- as.factor(trans_dev$k_symbol)
+trans_dev$account <- as.integer(trans_dev$account)
+
+str(trans_dev)
+cat("\n")
+summary(trans_dev)
+save(trans_dev, file="Rdata/trans_dev.Rdata")
+````
+
+## Missing values
+
+### Missing Values Analysis and Column Removal
+
+\* Remove the properties with more than 50% missing values
+
+````{r}
+datasets <- list (account, card_dev, client, disp, district, loan_dev, trans_dev)
+names <- list("account", "card_dev", "client", "disp", "district", "loan_dev", "trans_dev")
+
+for (i in seq_along(datasets)){
+  
+  dataset <- datasets[[i]]
+
+  numeroNa <- dataset %>%
+      summarise_all(~sum(is.na(.)))
+  
+  if(sum(numeroNa) > 0){
+    cat("Missing values in", names[[i]], "dataset:\n")
+    
+    for (col_name in names(numeroNa)) {
+      cat("  ",col_name, ": ",  sprintf("%.1f%%", numeroNa[[col_name]]/ length(dataset[[col_name]])*100))
+      
+      if(numeroNa[[col_name]]/ length(dataset[[col_name]])*100 > 50){
+        cat("  ", "**", col_name, "property removed **\n")
+        dataset <- subset(dataset, select = -get(col_name))
+        #datasets[[i]] <- dataset
+        
+      } else{
+        cat("\n")
+      }
+    }
+    cat("\n")
+  } else {
+   cat("No missing values in", names[[i]], "dataset\n")
+  }
+  new_dataset_name <- paste(names[[i]], "_transform", sep = "")
+  assign(new_dataset_name, dataset)
+  
+}
+rm(datasets)
+rm(dataset)
+rm(names)
+
+````
+
+### Imputation of missing values
+
+#### Analysis of what value to impute in the trans_dev dataset
+````{r}
+#trans_dev$status <- ifelse(is.na(trans_dev$bank), "NA", "Not NA")
+#trans_dev$statusKey <- ifelse(is.na(trans_dev$k_symbol), "NA", "Not NA")
+trans_dev$statusAccount <- ifelse(is.na(trans_dev$account), "NA", "Not NA")
+#trans_dev$statusOperation <- ifelse(is.na(trans_dev$operation), "NA", "Not NA")
+
+
+#test_single <- unique(trans_dev$k_symbol)
+#test_combine <- unique(trans_dev[, c("operation", "k_symbol")])
+#sort_test_combine <- test_combine[order(test_combine$k_symbol, test_combine$operation), ]
+
+#test_combine_operation <- unique(trans_dev[, c("statusOperation", "k_symbol")])
+#sort_test_combine_operation <- test_combine_operation[order(test_combine_operation$statusOperation, test_combine_operation$k_symbol), ]
+
+#test_3_combine <- unique((trans_dev[, c("operation", "status", "statusKey")]))
+#sort_test_3_combine <- test_3_combine [order(test_3_combine$status, test_3_combine$statusKey, test_3_combine$operation), ]
+
+#test_4_combine <- unique((trans_dev[, c("operation", "status", "statusKey", "statusAccount")]))
+#sort_test_4_combine <- test_4_combine [order(test_4_combine$status, test_4_combine$statusKey, test_4_combine$statusAccount,  test_4_combine$operation), ]
+
+#test_5_combine <- unique((trans_dev[, c("operation","type", "status", "statusKey", "statusAccount")]))
+#sort_test_5_combine <- test_5_combine [order(test_5_combine$type, test_5_combine$status, test_5_combine$statusKey, test_5_combine$statusAccount,  test_5_combine$operation), ]
+
+test_f_combine <- unique((trans_dev[, c("operation","type", "statusAccount")]))
+sort_test_f_combine <- test_f_combine [order(test_f_combine$type, test_f_combine$statusAccount,  test_f_combine$operation), ]
+
+
+#print(test_single)
+#print(test_combine)
+#print(sort_test_combine)
+
+#print(test_3_combine)
+#print(sort_test_3_combine)
+
+#print(test_4_combine)
+#print(sort_test_4_combine)
+
+
+#print(test_5_combine)
+#print(sort_test_5_combine)
+
+#print(test_f_combine)
+print(sort_test_f_combine)
+
+trans_dev <- trans_dev %>%
+  select(-statusAccount)
+
+`````
+Com o codigo anterior podemos observar que com grande provabilidade o NA na operation é "credit in cash"
+
+
+#### Imputing Missing Values in the trans_dev Dataset
+````{r}
+
+antes <- c(
+  NA_count = sum(is.na(trans_dev$operation)),
+  creditInCash_count = sum(trans_dev$operation == "credit in cash", na.rm = TRUE)
+)
+print(antes)
+cat("\n")
+
+trans_dev_transform$operation <- ifelse(
+  is.na(trans_dev$operation),
+  "credit in cash", 
+  as.character(trans_dev$operation)
+  )
+
+
+
+depois <- c(
+  NA_count = sum(is.na(trans_dev_transform$operation)),
+  creditInCash_count = sum(trans_dev_transform$operation == "credit in cash")
+)
+print(depois)
+
+````
+Tratar dos missing values no dataset District
+
+````{r}
+district_transform$`unemploymant rate '95` <- ifelse(is.na(district$`unemploymant rate '95`),
+                            round(mean(district$`unemploymant rate '95`, na.rm = TRUE), 2),
+                             district$`unemploymant rate '95`
+                             )
+
+district_transform$`no. of commited crimes '95` <- ifelse(is.na(district$`no. of commited crimes '95`),
+                             round(mean(district$`no. of commited crimes '95`, na.rm = TRUE), 0),
+                             district$`no. of commited crimes '95`
+                             )
+````
+
+## Duplicate Values
+
+````{r}
+datasets <- list (account, card_dev, client, disp, district, loan_dev, trans_dev)
+names <- list("account", "card_dev", "client", "disp", "district", "loan_dev", "trans_dev")
+
+for (i in seq_along(datasets)){
+  
+  dataset <- datasets[[i]]
+
+  duplicate_rows <- dataset[duplicated(dataset), ]
+  
+  if(sum(duplicate_rows) > 0){
+    cat(sum(duplicate_rows), "duplicat values in", names[[i]], "dataset\n")
+    
+  } else {
+   cat("No duplicate values in", names[[i]], "dataset\n")
+  }
+  new_dataset_name <- paste(names[[i]], "_transform", sep = "")
+  assign(new_dataset_name, dataset)
+  
+}
+rm(datasets)
+rm(names)
+
+include_columns <- c("account_id")
+duplicate_rows <-  account[duplicated(account[, include_columns]), ]
+print(sum(duplicate_rows))
+
+include_columns <- c("card_id", "disp_id")
+duplicate_rows <-  card_dev[duplicated(card_dev[, include_columns]), ]
+print(sum(duplicate_rows))
+
+include_columns <- c("client_id", "district_id")
+duplicate_rows <-  client[duplicated(client[, include_columns]), ]
+print(sum(duplicate_rows))
+
+include_columns <- c("code", "region")
+duplicate_rows <- district[duplicated(district[, include_columns]), ]
+print(sum(duplicate_rows))
+
+
+````
+## Handle errors in data
+
+
+````{r}
+account$account_id <- as.integer(account$account_id)
+account$district_id <- as.factor(account$district_id)
+str(account)
+summary(account)
+boxplot(account$date)
+hist(account$date, breaks = "months", xlab="Date by months", ylab = "density", main = "Histogram of dates")
+````
+
+## Encoding categorical variables
+
+\\ indicar a preseça do cartao bancario (ou nao) no client
+\\ consideramos que o client so tem cartao se for o owner da conta
+
+````{r}
+
+join <- left_join(client_transform, disp_transform, by = "client_id")
+client_transform <- join %>%
+  mutate(have_card = case_when(
+    is.na(type) ~ NA,
+    type == "OWNER" ~ TRUE,
+    type == "DISPONENT" ~ FALSE,
+  )) %>% 
+  select(-type, -disp_id, -account_id)
+
+rm(join)
+`````
+
+````{r}
+one_hot_encoded <- model.matrix(~ 0 + frequency, data = account_transform)
+factor_levels <- levels(account_transform$frequency)
+#print(factor_levels)
+custom_column_names <- paste("frequency", factor_levels, sep = ": ")
+colnames(one_hot_encoded) <- custom_column_names
+
+#print(one_hot_encoded)
+account_transform <- account_transform %>%
+    cbind(one_hot_encoded) %>%
+    select(-frequency)
+rm(one_hot_encoded, custom_column_names)
+````
+
+````{r}
+one_hot_encoded <- model.matrix(~ 0 + type, data = card_dev_transform)
+#print(one_hot_encoded)
+factor_levels <- levels(card_dev_transform$type)
+#print(factor_levels)
+custom_column_names <- paste("type", factor_levels, sep = ": ")
+colnames(one_hot_encoded) <- custom_column_names
+
+#print(one_hot_encoded)
+card_dev_transform <- card_dev_transform %>%
+    cbind(one_hot_encoded) %>%
+    select(-type)
+rm(one_hot_encoded, factor_levels, custom_column_names)
+````
+
+
+
+````{r}
+one_hot_encoded <- model.matrix(~ 0 + type, data = disp_transform)
+#print(one_hot_encoded)
+factor_levels <- levels(disp_transform$type)
+#print(factor_levels)
+custom_column_names <- paste("type", factor_levels, sep = ": ")
+colnames(one_hot_encoded) <- custom_column_names
+
+#print(one_hot_encoded)
+disp_transform <- disp_transform %>%
+    cbind(one_hot_encoded) %>%
+    select(-type)
+rm(one_hot_encoded, factor_levels, custom_column_names)
+````
+
+````{r}
+one_hot_encoded <- model.matrix(~ 0 + region, data = district_transform)
+#print(one_hot_encoded)
+factor_levels <- levels(district_transform$region)
+#print(factor_levels)
+custom_column_names <- paste("region", factor_levels, sep = ": ")
+colnames(one_hot_encoded) <- custom_column_names
+
+#print(one_hot_encoded)
+district_transform <- district_transform %>%
+    cbind(one_hot_encoded) %>%
+    select(-region)
+rm(one_hot_encoded, factor_levels, custom_column_names)
+````
+
+````{r}
+one_hot_encoded <- model.matrix(~ 0 + type, data = trans_dev_transform)
+#print(one_hot_encoded)
+factor_levels <- levels(trans_dev_transform$type)
+#print(factor_levels)
+
+custom_column_names <- paste("type", factor_levels, sep = ": ")
+colnames(one_hot_encoded) <- custom_column_names
+
+#print(one_hot_encoded)
+trans_dev_transform <- trans_dev_transform %>%
+    cbind(one_hot_encoded) %>%
+    select(-type)
+rm(one_hot_encoded, factor_levels, custom_column_names)
+
+````
+
+````{r}
+
+trans_dev_operation <- trans_dev_transform %>%
+  select(trans_id, operation)
+
+trans_dev_transform <- trans_dev_transform %>%
+  select(-operation)
+
+````
+
+## Feature engineering
+//todo: trans_dev_transform have the column statusAccount wrong
+
+Ver a ultima transaçao feita antes do loan para saber quanto dinheiro temos no banco antes de fazer a loan
+````{r}
+last_trans_per_client <- loan_dev_transform %>%
+  left_join(trans_dev_transform, 
+            by = "account_id",
+            suffix = c (".loan", ".trans")
+            ) %>%
+  group_by(account_id, date.loan) %>%
+  filter(date.loan > date.trans) %>%
+  slice_max(order_by = date.trans ) %>%
+  slice_max(order_by = trans_id) %>%
+  ungroup() %>%
+  select( "account_id", "balance") %>%
+  rename(money_in_account = balance)
+
+loan_dev_transform <- loan_dev_transform %>% 
+  left_join(last_trans_per_client, by = "account_id")  # ultima transaçao antes da data da loan 
+  
+rm(last_trans_per_client)
+````
+
+
+````{r}
+save(account_transform, file="Rdata/account.Rdata")
+save(card_dev_transform, file="Rdata/card_dev.Rdata")
+save(client_transform, file="Rdata/client.Rdata")
+save(disp_transform, file="Rdata/disp.Rdata")
+save(district_transform, file="Rdata/district.RData")
+save(loan_dev_transform, file="Rdata/loan_dev.Rdata")
+save(trans_dev_transform, file="Rdata/trans_dev.Rdata")
+save(trans_dev_operation, file="Rdata/trans_dev_operation.Rdata")
+save(district_name, file="Rdata/district_name.Rdata")
+
+#load()
+````
