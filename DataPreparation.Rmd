@@ -73,7 +73,7 @@ Data cleaning:
 
 Data transformation:
 
-- [ ]  Feature engineering;
+- [x]  Feature engineering;
 - [ ]  Scaling
 - [x]  Encoding categorical variables
 - [x]  Date and time parsing
@@ -122,7 +122,6 @@ str(card_dev)
 cat("\n")
 summary(card_dev)
 
-save(card_dev, file="Rdata/card_dev.Rdata")
 
 `````
 
@@ -135,7 +134,6 @@ str(client)
 cat("\n")
 summary(client)
 
-save(client, file="Rdata/client.Rdata")
 
 `````
 
@@ -151,7 +149,6 @@ str(disp)
 cat("\n")
 summary(disp)
 
-save(disp, file="Rdata/disp.Rdata")
 
 `````
 
@@ -177,7 +174,6 @@ district <- select(district, -name)
 str(district)
 cat("\n")
 summary(district)
-save(district, file="Rdata/district.Rdata")
 `````
 
 ````{r}
@@ -193,7 +189,6 @@ str(loan_dev)
 cat("\n")
 summary(loan_dev)
 
-save(loan_dev, file="Rdata/loan_dev.Rdata")
 `````
 
 ````{r}
@@ -210,7 +205,6 @@ trans_dev$account <- as.integer(trans_dev$account)
 str(trans_dev)
 cat("\n")
 summary(trans_dev)
-save(trans_dev, file="Rdata/trans_dev.Rdata")
 ````
 
 ## Missing values
@@ -309,6 +303,8 @@ print(sort_test_f_combine)
 trans_dev <- trans_dev %>%
   select(-statusAccount)
 
+rm(test_f_combine, sort_test_f_combine)
+
 `````
 Com o codigo anterior podemos observar que com grande provabilidade o NA na operation é "credit in cash"
 
@@ -324,9 +320,9 @@ print(antes)
 cat("\n")
 
 trans_dev_transform$operation <- ifelse(
-  is.na(trans_dev$operation),
+  is.na(trans_dev_transform$operation),
   "credit in cash", 
-  as.character(trans_dev$operation)
+  as.character(trans_dev_transform$operation)
   )
 
 
@@ -355,7 +351,7 @@ district_transform$`no. of commited crimes '95` <- ifelse(is.na(district$`no. of
 ## Duplicate Values
 
 ````{r}
-datasets <- list (account, card_dev, client, disp, district, loan_dev, trans_dev)
+datasets <- list (account_transform, card_dev_transform, client_transform, disp_transform, district_transform, loan_dev_transform, trans_dev_transform)
 names <- list("account", "card_dev", "client", "disp", "district", "loan_dev", "trans_dev")
 
 for (i in seq_along(datasets)){
@@ -418,8 +414,8 @@ join <- left_join(client_transform, disp_transform, by = "client_id")
 client_transform <- join %>%
   mutate(have_card = case_when(
     is.na(type) ~ NA,
-    type == "OWNER" ~ TRUE,
-    type == "DISPONENT" ~ FALSE,
+    type == "OWNER" ~ 1,
+    type == "DISPONENT" ~ 0,
   )) %>% 
   select(-type, -disp_id, -account_id)
 
@@ -502,9 +498,6 @@ trans_dev_transform <- trans_dev_transform %>%
     select(-type)
 rm(one_hot_encoded, factor_levels, custom_column_names)
 
-````
-
-````{r}
 
 trans_dev_operation <- trans_dev_transform %>%
   select(trans_id, operation)
@@ -539,6 +532,83 @@ rm(last_trans_per_client)
 ````
 
 
+Calcular o dia dos anos do cliente (correctamente)
+Calcular o genero do cliente
+    se o gender for feminino é 1 (sim), se masculino é 0(nao) 
+
+````{r}
+
+client_transform <- client_transform %>%
+  mutate(year = as.numeric(substr(birth_number, 1, 2))) %>%
+  mutate(month = as.numeric(substr(birth_number, 3, 4))) %>%
+  mutate(genderF = if_else(month > 50, 1, 0)) %>%
+  mutate(month = if_else(month > 50, month - 50, month)) %>%
+  mutate(day = as.numeric(substr(birth_number, 5, 6))) %>%
+  mutate(birth_day = as.Date(paste(paste("19", year, sep=""), month, day, sep = "-"), format = "%Y-%m-%d")) %>%
+  select( -year, -month, -day, -birth_number)
+
+
+````
+
+Calcular a idade do cliente quando fez a loan
+
+```{r}
+
+age_loan <- loan_dev_transform %>%
+  left_join(disp_transform, 
+            by = "account_id",
+            ) %>%
+   left_join(client_transform, 
+            by = "client_id",
+            ) %>%
+    mutate(age = floor(as.numeric(difftime(date, birth_day, units = "days")/ 365.25)) ) %>%
+  select(loan_id ,age)
+
+loan_dev_transform <- loan_dev_transform %>%
+  left_join(age_loan, 
+            by= "loan_id")
+
+
+````
+
+
+
+## Feature Scaling
+\\ Feature scaling is a preprocessing step that aims to standardize or normalize the range of independent variables or features of a dataset
+
+
+\\ diferença entre dimensionality redution and feature scaling (data Transformation) 
+````{r}
+
+````
+
+
+````{r}
+
+````
+
+< !-- ## Handling Imbalanced Data
+
+Fazer depois no final
+
+````{r}
+
+````
+
+````{r}
+#set.seed(2023)
+#account_transform_sample <- account_transform %>%
+#  slice_sample(prop = 0.5)
+
+#account_transform %>%
+#  summary()
+#account_transform_sample %>%
+#  summary()
+
+
+````
+-- > 
+## Save
 ````{r}
 save(account_transform, file="Rdata/account.Rdata")
 save(card_dev_transform, file="Rdata/card_dev.Rdata")

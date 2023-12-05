@@ -533,8 +533,20 @@ rm(last_trans_per_client)
 
 ## Feature Scaling
 
+\\ diferença entre dimensionality redution and feature scaling (data Transformation) 
+````{r}
+
+````
 
 
+````{r}
+
+````
+
+## Sampling Data
+
+
+## Save
 ````{r}
 save(account_transform, file="Rdata/account.Rdata")
 save(card_dev_transform, file="Rdata/card_dev.Rdata")
