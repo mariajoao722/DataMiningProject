@@ -77,11 +77,11 @@ Data transformation:
 - [ ]  Scaling
 - [x]  Encoding categorical variables
 - [x]  Date and time parsing
-- [ ]  text data processing
+- [x]  text data processing
 
 Handling Imbalanced Data:
 
-- [ ] Oversampling...;
+- [x] Oversampling...;
 
 Data splitting:
 
@@ -508,7 +508,6 @@ trans_dev_transform <- trans_dev_transform %>%
 ````
 
 ## Feature engineering
-//todo: trans_dev_transform have the column statusAccount wrong
 
 Ver a ultima transaçao feita antes do loan para saber quanto dinheiro temos no banco antes de fazer a loan
 ````{r}
@@ -541,7 +540,7 @@ Calcular o genero do cliente
 client_transform <- client_transform %>%
   mutate(year = as.numeric(substr(birth_number, 1, 2))) %>%
   mutate(month = as.numeric(substr(birth_number, 3, 4))) %>%
-  mutate(genderF = if_else(month > 50, 1, 0)) %>%
+  mutate(gender_F = if_else(month > 50, 1, 0)) %>%
   mutate(month = if_else(month > 50, month - 50, month)) %>%
   mutate(day = as.numeric(substr(birth_number, 5, 6))) %>%
   mutate(birth_day = as.Date(paste(paste("19", year, sep=""), month, day, sep = "-"), format = "%Y-%m-%d")) %>%
@@ -568,34 +567,161 @@ loan_dev_transform <- loan_dev_transform %>%
   left_join(age_loan, 
             by= "loan_id")
 
+rm(age_loan)
+````
 
+## Dimensionality redution
+//todo
+
+## Data splitting
+
+````{r}
+split_data <- function(data, train_fraction = 0.8, seed = 2023) {
+  set.seed(seed)
+  n_train <- round(train_fraction * nrow(data))
+  train_indices <- sample(1:nrow(data), n_train)
+  train_data <- data[train_indices, ]
+  test_data <- data[-train_indices, ]
+  
+  return(list(train = train_data, test = test_data))
+}
+
+datasets <- list(account_transform, card_dev_transform, client_transform, disp_transform, district_name, district_transform, loan_dev_transform, trans_dev_operation, trans_dev_transform) 
+
+names <- list("account_transform", "card_dev_transform", "client_transform", "disp_transform", "district_name_transform", "district_transform", "loan_dev_transform", "trans_dev_operation_transform", "trans_dev_transform")
+
+split_datasets <- lapply(datasets, split_data)
+
+i <- 1
+
+assign_names <- function(split_ds) {
+  #cat("ds:", length(split_ds), "\n")
+  train_name <- paste(names[[i]], "_train", sep = "")
+  test_name <- paste(names[[i]], "_test", sep = "")
+  #cat("train_name:", train_name, "\n")
+  #cat("test_name:", test_name, "\n")
+
+  assign(train_name, split_ds$train, envir = .GlobalEnv)
+  assign(test_name, split_ds$test, envir = .GlobalEnv)
+  
+  i <<- i+1
+}
+
+new_dataset_name <- lapply(split_datasets, assign_names)
+
+rm(datasets)
 ````
 
 
 
 ## Feature Scaling
-\\ Feature scaling is a preprocessing step that aims to standardize or normalize the range of independent variables or features of a dataset
+// Feature scaling is a preprocessing step that aims to standardize or normalize the range of independent variables or features of a dataset
 
+Standardization (Z-score normalization)
 
-\\ diferença entre dimensionality redution and feature scaling (data Transformation) 
+todo: district_transformation maybe need other thing than on-hot encoding
+
 ````{r}
+
+features <- c(
+  'no. of inhabitants', 'no. of municipalities with inhabitants < 499',
+  'no. of municipalities with inhabitants 500-1999', 'no. of municipalities with inhabitants 2000-9999',
+  'no. of municipalities with inhabitants >10000', 'no. of cities', 'ratio of urban inhabitants',
+  'average salary', 'unemploymant rate \'95', 'unemploymant rate \'96',
+  'no. of enterpreneurs per 1000 inhabitants', 'no. of commited crimes \'95',
+  'no. of commited crimes \'96'
+)
+
+district_transform_train[, features] <- scale(district_transform_train[,features])
+
+````
+
+Teste para verificar se a visualização da padronização (z-scale) foi aplicada correctamente. 
+
+````{r}
+summary(district_transform_train[, features])
+#class(district_transform_train[, features[1]])
+
+
+# Após a padronização
+hist(district_transform_train[, features[1]],
+     main = "Histogram no. of inhabitants after standardization",
+     xlab = "no. of inhabitants",
+     ylab = "frequency"
+     )
+
+rm(features)
+
+````
+
+````{r}
+
+features_loan <- c(
+  'amount',
+  'duration',
+  'payments',
+  'money_in_account'
+)
+
+loan_dev_transform_train[, features_loan] <- scale(loan_dev_transform_train[, features_loan])
+````
+
+Teste para verificar se a visualização da padronização (z-scale) foi aplicada correctamente. 
+
+````{r}
+summary(loan_dev_transform_train[, features])
+#class(loan_dev_transform_train[[features_loan[1]]])
+
+hist(loan_dev_transform_train[[features_loan[1]]],
+     main = "Histogram of amount after standardization",
+     xlab = "amount",
+     ylab = "frequency"
+)
+
+rm(features_loan)
+
+````
+````{r}
+
+features_trans <- c(
+  'amount',
+  'balance'
+)
+
+trans_dev_transform_train[, features_trans] <- scale(trans_dev_transform_train[, features_trans])
+````
+
+Teste para verificar se a visualização da padronização (z-scale) foi aplicada correctamente. 
+
+````{r}
+summary(trans_dev_transform_train[, features_trans])
+#class(trans_dev_transform_train[[features_trans[1]]])
+
+hist(trans_dev_transform_train[[features_trans[1]]],
+     main = "Histogram of amount after standardization",
+     xlab = "amount",
+     ylab = "frequency",
+     xlim = c(-2, 6)
+)
+
+hist(trans_dev_transform_train[[features_trans[2]]],
+     main = "Histogram of balance after standardization",
+     xlab = "balance",
+     ylab = "frequency",
+     xlim = c(-2, 6)
+)
+
+rm(features_loan)
 
 ````
 
 
-````{r}
+````{r, echo=FALSE}
 
-````
+## Handling Imbalanced Data
 
-< !-- ## Handling Imbalanced Data
+#Fazer depois no final
 
-Fazer depois no final
-
-````{r}
-
-````
-
-````{r}
 #set.seed(2023)
 #account_transform_sample <- account_transform %>%
 #  slice_sample(prop = 0.5)
@@ -605,9 +731,9 @@ Fazer depois no final
 #account_transform_sample %>%
 #  summary()
 
-
 ````
--- > 
+
+
 ## Save
 ````{r}
 save(account_transform, file="Rdata/account.Rdata")
@@ -619,6 +745,29 @@ save(loan_dev_transform, file="Rdata/loan_dev.Rdata")
 save(trans_dev_transform, file="Rdata/trans_dev.Rdata")
 save(trans_dev_operation, file="Rdata/trans_dev_operation.Rdata")
 save(district_name, file="Rdata/district_name.Rdata")
+
+#save train datasets
+save(account_transform_train, file="Rdata/train/account_train.Rdata")
+save(card_dev_transform_train, file="Rdata/train/card_dev_train.Rdata")
+save(client_transform_train, file="Rdata/train/client_train.Rdata")
+save(disp_transform_train, file="Rdata/train/disp_train.Rdata")
+save(district_transform_train, file="Rdata/train/district_train.RData")
+save(loan_dev_transform_train, file="Rdata/train/loan_dev_train.Rdata")
+save(trans_dev_transform_train, file="Rdata/train/trans_dev_train.Rdata")
+save(trans_dev_operation_transform_train, file="Rdata/train/trans_dev_operation_train.Rdata")
+save(district_name_transform_train, file="Rdata/train/district_name_train.Rdata")
+
+#save test dataset
+save(account_transform_test, file="Rdata/test/account_test.Rdata")
+save(card_dev_transform_test, file="Rdata/test/card_dev_test.Rdata")
+save(client_transform_test, file="Rdata/test/client_test.Rdata")
+save(disp_transform_test, file="Rdata/test/disp_test.Rdata")
+save(district_transform_test, file="Rdata/test/district_test.RData")
+save(loan_dev_transform_test, file="Rdata/test/loan_dev_test.Rdata")
+save(trans_dev_transform_test, file="Rdata/test/trans_dev_test.Rdata")
+save(trans_dev_operation_transform_test, file="Rdata/test/trans_dev_operation_test.Rdata")
+save(district_name_transform_test, file="Rdata/test/district_name_test.Rdata")
+
 
 #load()
 ````
