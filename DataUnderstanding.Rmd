@@ -142,33 +142,8 @@ ggplot(loan_dev, aes(x = date)) +
      ylab("Number of Loans")
 ```
 
-<<<<<<< Updated upstream
-```{r}
-ggplot(loan_dev, aes(x = date)) +
-  geom_line(stat = "count", color = "blue") +
-  ggtitle("Loan Distribution Over Time") +
-  xlab("Date") +
-  ylab("Number of Loans")
 
-```
-
-Para juntar a informação do estado dos empréstimos com o id do cliente foi preciso dar merge a dois datasets, mas para não juntar colunas desnecessárias primeiro escolhemos as colunas necesárias.
-
-```{r}
-selected_columns <- loan_dev %>%
-    select(account_id, status,date)
-```
-
-Após selecionar as colunas vamos dar merge do novo dataset criado com o dataset disp.
-
-```{r}
-merge_loan_disp <- merge(selected_columns, disp, by = "account_id")
-```
-
-=======
->>>>>>> Stashed changes
 ## Trans_dev
-
 
 De sequida iremos ter uma visão geral sobre as estatísticas do dataset trans_dev.
 
@@ -193,12 +168,7 @@ ggplot(trans_dev, aes(x = operation)) + geom_bar() + ggtitle("Distribution of tr
 
 No output oberservamos um valor elevado de NA, nos próximos passo será necessário o tratamente deste missing values.
 
-<<<<<<< Updated upstream
-## Account Dataset
-=======
-
 ## Account
->>>>>>> Stashed changes
 
 Frequência da frequência dos pagamentos
 
@@ -304,37 +274,10 @@ print(head(district_summary))
 print(tail(district_summary))
 ```
 
-O distrito com o maior numero de contas é o distrito nº1 e o distrito com o menos número de contas é o dsitrito nº20 e distrito nº24
+O distrito com o maior numero de contas é o distrito nº1 e o distrito com o menos número de contas é o distrito nº20 e distrito nº24
 
-<<<<<<< Updated upstream
-```{r}
-# Calculate age from birth_number (assuming birth_number is in the format YYMMDD)
-client$birth_number <- as.character(client$birth_number)
-client$birth_year <- as.numeric(substr(client$birth_number, 1, 2))
-client$age <- 2023 - (1900 + client$birth_year)  # Adjust for the two-digit year
-```
 
-Calcular a idade do cliente quando fez o loan
-
-```{r}
-selected_columns1 <- merge_loan_disp %>%
-    select(client_id,date,status)
-
-merge_loan_client <- merge(selected_columns1, client, by = "client_id")
-```
-
-```{r}
-merge_loan_client$birth_number <- as.character(merge_loan_client$birth_number)
-merge_loan_client$birth_year <- as.numeric(substr(merge_loan_client$birth_number, 1, 2))
-merge_loan_client$date <- as.character(merge_loan_client$date)
-merge_loan_client$loan_year <- as.numeric(substr(merge_loan_client$date, 1, 2))
-merge_loan_client$age <- (1900 + merge_loan_client$loan_year) - (1900 + merge_loan_client$birth_year)  # Adjust for the two-digit year
-```
-
-## DISTRIC
-=======
 ## District
->>>>>>> Stashed changes
 
 Distribuição da população pelas diferentes regiões.
 
@@ -358,12 +301,7 @@ ggplot(district, aes(x = region, y = `average salary`, fill = region)) +
   scale_fill_brewer(palette = "Set3")  # Choose a color palette
 ```
 
-<<<<<<< Updated upstream
-Prague aparece como uma linha só, pois no dataset esta região tem apenas um valor atribuído enquanto as outras regiões tÊm vários valores atribuídos. Observamos que para além de Prague, Central Bohemia é a região com maior média salarial, mas o intervalo salarial é maior que as outras regiões. Nas regiões South Bohemia, South Moravia e West Bohemia existem alguns outliers, este podem ser erros dos dados ou podem significar que em alguns casos nestas regiões existem habitantes a ganhar mais do que a média salarial.
-=======
-
 Prague aparece como uma linha só, pois no dataset esta região tem apenas um valor atribuído enquanto as outras regiões têm vários valores atribuídos. Observamos que para além de Prague, Central Bohemia é a região com maior média salarial, mas o intervalo salarial é maior que as outras regiões. Nas regiões South Bohemia, South Moravia e West Bohemia existem alguns outliers, este podem ser erros dos dados ou podem significar que em alguns casos nestas regiões existem habitantes a ganhar mais do que a média salarial.
->>>>>>> Stashed changes
 
 Criminalidade em 1996
 
