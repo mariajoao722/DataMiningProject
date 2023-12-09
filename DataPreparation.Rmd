@@ -570,6 +570,33 @@ loan_dev_transform <- loan_dev_transform %>%
 rm(age_loan)
 ````
 
+
+Juntar tudo o importante num dataset
+
+````{r}
+
+district_average_salary <- district_transform %>%
+  select(code, `average salary`) %>%
+  mutate(district_id = code) %>%
+  select(-code)
+
+merge_data <- loan_dev_transform %>%
+  left_join(disp_transform, 
+            by = "account_id",
+            ) %>%
+   left_join(client_transform, 
+            by = "client_id",
+            ) %>%
+  select(
+    client_id, district_id, have_card, gender_F, birth_day,
+    loan_id, account_id, date, amount, duration, payments, status, money_in_account, age
+  ) %>%
+  mutate(district_id = as.integer(district_id)) %>%
+  left_join(district_average_salary,
+            by="district_id")
+
+```
+
 ## Dimensionality redution
 //todo
 
@@ -586,9 +613,9 @@ split_data <- function(data, train_fraction = 0.8, seed = 2023) {
   return(list(train = train_data, test = test_data))
 }
 
-datasets <- list(account_transform, card_dev_transform, client_transform, disp_transform, district_name, district_transform, loan_dev_transform, trans_dev_operation, trans_dev_transform) 
+datasets <- list(account_transform, card_dev_transform, client_transform, disp_transform, district_name, district_transform, loan_dev_transform, trans_dev_operation, trans_dev_transform, merge_data) 
 
-names <- list("account_transform", "card_dev_transform", "client_transform", "disp_transform", "district_name_transform", "district_transform", "loan_dev_transform", "trans_dev_operation_transform", "trans_dev_transform")
+names <- list("account_transform", "card_dev_transform", "client_transform", "disp_transform", "district_name_transform", "district_transform", "loan_dev_transform", "trans_dev_operation_transform", "trans_dev_transform", "merge_data")
 
 split_datasets <- lapply(datasets, split_data)
 
@@ -714,7 +741,19 @@ hist(trans_dev_transform_train[[features_trans[2]]],
 rm(features_loan)
 
 ````
+````{r}
 
+features_merge <- c(
+  'amount',
+  'duration',
+  'payments',
+  'money_in_account',
+  'age',
+  'average salary'
+)
+
+merge_data_train[, features_merge] <- scale(merge_data_train[, features_merge])
+````
 
 ````{r, echo=FALSE}
 
@@ -732,6 +771,7 @@ rm(features_loan)
 #  summary()
 
 ````
+
 
 
 ## Save
