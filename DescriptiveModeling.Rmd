@@ -1,0 +1,57 @@
+---
+title: "Descriptive Modeling Report"
+author: "Maria Pais, Mónica Araújo"
+date: "2023-11-07"
+output:
+  html_document:
+    number_sections: yes
+    theme: flatly  # journal flatly spacelab cosmo
+    highlight: tango
+    toc : yes
+    toc_float:
+      collapsed: true
+      smoth_scroll: true
+  word_document: 
+    toc :yes
+  pdf_document:
+    toc : yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+<!-- load packagers -->
+<!-- include = false is for Hiding the code and the output in final file-->
+```{r, include = FALSE}
+library(tidyverse)
+library(tidymodels)
+library(dplyr)
+```
+
+# Load Data
+
+The data is already preprocessed in the DataPreparation step. The result is save in a RData file. 
+
+```{r load_data, echo=TRUE}
+# train dataset
+load("Rdata/train/merge_data_train.Rdata")
+
+# test dataset
+load("Rdata/test/merge_data_test.Rdata")
+
+`````
+
+
+
+
+
+
+
+
+
+
