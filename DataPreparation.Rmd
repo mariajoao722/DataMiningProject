@@ -1,5 +1,5 @@
 ---
-title: "DataPreparation"
+title: "Data Preparation"
 author: "Maria Pais, Mónica Araújo"
 date: "2023-11-07"
 output:
@@ -128,7 +128,7 @@ summary(card_dev)
 ````{r}
 client$client_id <- as.integer(client$client_id)
 client$birth_number <- as.integer(client$birth_number)
-client$district_id <- as.factor(client$district_id)
+client$district_id <- as.integer(client$district_id)
 
 str(client)
 cat("\n")
@@ -183,7 +183,7 @@ loan_dev$account_id <- as.integer(loan_dev$account_id)
 if(!inherits(loan_dev$date, "Date")){
   loan_dev$date <- as.Date(sprintf("%s%s", "19", loan_dev$date), format="%Y%m%d")
 }
-loan_dev$status <- as.factor(loan_dev$status)
+loan_dev$status <- as.numeric(loan_dev$status)
 
 str(loan_dev)
 cat("\n")
@@ -687,7 +687,8 @@ features_loan <- c(
   'amount',
   'duration',
   'payments',
-  'money_in_account'
+  'money_in_account',
+  'age'
 )
 
 loan_dev_transform_train[, features_loan] <- scale(loan_dev_transform_train[, features_loan])
@@ -696,7 +697,7 @@ loan_dev_transform_train[, features_loan] <- scale(loan_dev_transform_train[, fe
 Teste para verificar se a visualização da padronização (z-scale) foi aplicada correctamente. 
 
 ````{r}
-summary(loan_dev_transform_train[, features])
+summary(loan_dev_transform_train[, features_loan])
 #class(loan_dev_transform_train[[features_loan[1]]])
 
 hist(loan_dev_transform_train[[features_loan[1]]],
@@ -753,6 +754,14 @@ features_merge <- c(
 )
 
 merge_data_train[, features_merge] <- scale(merge_data_train[, features_merge])
+
+
+mean_values <- colMeans(merge_data_train[, features_merge], na.rm = TRUE)
+standerd_deviation_values <- apply(merge_data_train[, features_merge], 2, sd, na.rm = TRUE)
+
+merge_data_test[, features_merge] <- scale(merge_data_test[, features_merge], center = mean_values, scale = standerd_deviation_values)
+
+rm(features_merge, mean_values, standerd_deviation_values)
 ````
 
 ````{r, echo=FALSE}
@@ -785,28 +794,33 @@ save(loan_dev_transform, file="Rdata/loan_dev.Rdata")
 save(trans_dev_transform, file="Rdata/trans_dev.Rdata")
 save(trans_dev_operation, file="Rdata/trans_dev_operation.Rdata")
 save(district_name, file="Rdata/district_name.Rdata")
+save(merge_data, file="Rdata/merge_data.Rdata")
+
 
 #save train datasets
-save(account_transform_train, file="Rdata/train/account_train.Rdata")
-save(card_dev_transform_train, file="Rdata/train/card_dev_train.Rdata")
-save(client_transform_train, file="Rdata/train/client_train.Rdata")
-save(disp_transform_train, file="Rdata/train/disp_train.Rdata")
-save(district_transform_train, file="Rdata/train/district_train.RData")
-save(loan_dev_transform_train, file="Rdata/train/loan_dev_train.Rdata")
-save(trans_dev_transform_train, file="Rdata/train/trans_dev_train.Rdata")
-save(trans_dev_operation_transform_train, file="Rdata/train/trans_dev_operation_train.Rdata")
-save(district_name_transform_train, file="Rdata/train/district_name_train.Rdata")
+#save(account_transform_train, file="Rdata/train/account_train.Rdata")
+#save(card_dev_transform_train, file="Rdata/train/card_dev_train.Rdata")
+#save(client_transform_train, file="Rdata/train/client_train.Rdata")
+#save(disp_transform_train, file="Rdata/train/disp_train.Rdata")
+#save(district_transform_train, file="Rdata/train/district_train.RData")
+#save(loan_dev_transform_train, file="Rdata/train/loan_dev_train.Rdata")
+#save(trans_dev_transform_train, file="Rdata/train/trans_dev_train.Rdata")
+#save(trans_dev_operation_transform_train, file="Rdata/train/trans_dev_operation_train.Rdata")
+#save(district_name_transform_train, file="Rdata/train/district_name_train.Rdata")
+save(merge_data_train, file="Rdata/train/merge_data_train.Rdata")
+
 
 #save test dataset
-save(account_transform_test, file="Rdata/test/account_test.Rdata")
-save(card_dev_transform_test, file="Rdata/test/card_dev_test.Rdata")
-save(client_transform_test, file="Rdata/test/client_test.Rdata")
-save(disp_transform_test, file="Rdata/test/disp_test.Rdata")
-save(district_transform_test, file="Rdata/test/district_test.RData")
-save(loan_dev_transform_test, file="Rdata/test/loan_dev_test.Rdata")
-save(trans_dev_transform_test, file="Rdata/test/trans_dev_test.Rdata")
-save(trans_dev_operation_transform_test, file="Rdata/test/trans_dev_operation_test.Rdata")
-save(district_name_transform_test, file="Rdata/test/district_name_test.Rdata")
+# save(account_transform_test, file="Rdata/test/account_test.Rdata")
+# save(card_dev_transform_test, file="Rdata/test/card_dev_test.Rdata")
+# save(client_transform_test, file="Rdata/test/client_test.Rdata")
+# save(disp_transform_test, file="Rdata/test/disp_test.Rdata")
+# save(district_transform_test, file="Rdata/test/district_test.RData")
+# save(loan_dev_transform_test, file="Rdata/test/loan_dev_test.Rdata")
+# save(trans_dev_transform_test, file="Rdata/test/trans_dev_test.Rdata")
+# save(trans_dev_operation_transform_test, file="Rdata/test/trans_dev_operation_test.Rdata")
+# save(district_name_transform_test, file="Rdata/test/district_name_test.Rdata")
+save(merge_data_test, file="Rdata/test/merge_data_test.Rdata")
 
 
 #load()
