@@ -52,7 +52,7 @@ load("Rdata/test/merge_data_test.Rdata")
 
 load("Rdata/merge_data.Rdata")
 
-load("merge_data_kagle.Rdata")
+# load("Rdata/merge_data_kaggle.Rdata")
 ```
 
 
@@ -62,7 +62,7 @@ load("merge_data_kagle.Rdata")
 
 ```{r}
 selected_columns2 <- merge_data %>%
-     select(age,status,district_id,have_card,`average salary`)
+     select(age,status,district_id,have_card,`average salary`, money_in_account, gender_F)
 
 selected_columns2$status <- as.integer(selected_columns2$status)
 ```
@@ -82,8 +82,10 @@ vip(rt_fit)
 ## Linear Regression
 
 ```{r}
+merge_data_train$status <- as.numeric(as.character(merge_data_train$status))
+
 # Create a linear regression model
-linear_model <- lm(status ~ age, data = merge_data_train)
+linear_model <- lm(status ~ age + district_id + gender_F + money_in_account + `average salary`, data = merge_data_train)
 
 # Print the summary of the model
 summary(linear_model)
@@ -94,6 +96,43 @@ predictions <- predict(linear_model, newdata = merge_data_test)
 print(predictions)
 ```
 
+Coeficientes:
+
+Intercept (Constant): 0.7627712
+age: -0.0188916
+district_id: -0.0005803
+gender_F: -0.0343221
+money_in_account: 0.1132278
+average salary: 0.0061305
+
+Estes coeficientes representam a variação estimada na variável de resposta (estado) para uma variação de uma unidade no fator de previsão correspondente, mantendo os outros factores de previsão constantes.
+
+
+Significance:
+
+A coluna Estimativa fornece a estimativa pontual para cada coeficiente.
+A coluna Erro padrão fornece o erro padrão da estimativa.
+As colunas Valor t e Pr(>|t|) fornecem informações sobre a significância de cada coeficiente. Um valor p menor indica um preditor mais significativo.
+
+
+Residuals:
+Os resíduos são as diferenças entre os valores observados e previstos..
+
+Residual Standard Error:
+Esta é uma estimativa do desvio padrão dos resíduos. Dá uma ideia de quão bem o modelo se ajusta aos dados.
+
+Multiple R-squared and Adjusted R-squared:
+Estes valores indicam a proporção da variância explicada pelo modelo. O R-quadrado ajustado considera o número de preditores no modelo.
+
+F-statistic and p-value:
+A estatística F testa a significância geral do modelo. O valor p avalia se pelo menos uma variável de previsão tem um coeficiente diferente de zero.Uma estatística F mais alta indica um modelo mais significativo. Neste caso, a estatística F é 1,537 com um valor p de 0,1786, sugerindo que o modelo pode não ser estatisticamente significativo.
+
+No nosso modelo:
+A variável average salary não parece ser estatisticamente significativa com base no valor p (0,90097).
+O modelo como um todo (valor de p da estatística F: 0,1786) não fornece evidência forte contra a hipótese nula de que todos os coeficientes são zero.
+Por outro lado a variável money_in_account é estatisticamente significativa na previsão do status.
+
+
 
 ## Random Forest
 
@@ -102,7 +141,8 @@ print(predictions)
 merge_data_train$status <- as.factor(merge_data_train$status)
 
 # Build Random Forest classification model
-rf_model <- randomForest(status ~ age + district_id + gender_F + money_in_account, data = merge_data_train)
+rf_model <- randomForest(status ~ age + district_id + gender_F + money_in_account  + have_card, data = merge_data_train)
+
 
 predictions <- predict(rf_model, newdata = merge_data_test)
 ```
@@ -117,16 +157,32 @@ print(confusion_matrix)
 print(accuracy)
 ```
 
+No output observámos que a accuracy deste modelo é de 0.848484, ou seja 84%.
 
-## Kagle
+<!-- load packagers 
+## Kaggle -->
 
-```{r}
-predicted_probabilities <- predict(rf_model, newdata = merge_data_kagle, type = "prob")
-acceptance_percentage <- predicted_probabilities[, "1"] * 100 
-rejection_percentage <- 100 - acceptance_percentage
-final_kaggle <- data.frame(loan_id = merge_data_kagle$loan_id, rejection_percentage)
-print(acceptance_percentage)
-print(rejection_percentage)
+```{r eval=FALSE, include=FALSE}
+new_column_names <- c("client_id", "district_id", "have_card", "gender_F", "birth_day", "loan_id", "account_id",
+                      "date", "amount", "duration", "payments", "money_in_account", "age", "average_salary")
+
+colnames(merge_data1) <- new_column_names
+rm(new_column_names)
 ```
 
+```{r eval=FALSE, include=FALSE}
+predicted_probabilities <- predict(rf_model, newdata = merge_data1, type = "prob")
+acceptance_percentage <- predicted_probabilities[, "1"] * 100 
+rejection_percentage <- 100 - acceptance_percentage
+final_kaggle <- data.frame(Id = merge_data1$loan_id, Predicted = rejection_percentage)
+write.csv(final_kaggle, file = "final_kaggle.csv", row.names = FALSE)
+```
+
+
+## Modelo escolhido
+
+O R-squared do modelo de regressão linear é bastante baixo, indicando que o modelo explica apenas uma pequena proporção da variação na variável de resposta.
+O modelo de random forest tem maior exatidão, precisão e recuperação, o que sugere um melhor desempenho global de classificação em comparação com o modelo de regressão linear.
+
+Com base nos resultados escolhemos o modelo random forest.
 
