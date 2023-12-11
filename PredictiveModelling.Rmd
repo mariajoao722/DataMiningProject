@@ -52,7 +52,7 @@ load("Rdata/test/merge_data_test.Rdata")
 
 load("Rdata/merge_data.Rdata")
 
-load("Rdata/merge_data_kaggle.Rdata")
+# load("Rdata/merge_data_kaggle.Rdata")
 ```
 
 
@@ -136,30 +136,12 @@ Por outro lado a variável money_in_account é estatisticamente significativa na
 
 ## Random Forest
 
-```{r include=FALSE}
-new_column_names <- c("client_id", "district_id", "have_card", "gender_F", "birth_day", "loan_id", "account_id",
-                      "date", "amount", "duration", "status", "payments", "money_in_account", "age", "average_salary")
-
-colnames(merge_data_train) <- new_column_names
-rm(new_column_names)
-```
-
-
-```{r include=FALSE}
-new_column_names <- c("client_id", "district_id", "have_card", "gender_F", "birth_day", "loan_id", "account_id",
-                      "date", "amount", "duration", "status", "payments", "money_in_account", "age", "average_salary")
-
-colnames(merge_data_test) <- new_column_names
-rm(new_column_names)
-```
-
-
 ```{r}
 # Convert status to a factor
 merge_data_train$status <- as.factor(merge_data_train$status)
 
 # Build Random Forest classification model
-rf_model <- randomForest(status ~ age + district_id + gender_F + money_in_account  + have_card , data = merge_data_train)
+rf_model <- randomForest(status ~ age + district_id + gender_F + money_in_account  + have_card, data = merge_data_train)
 
 
 predictions <- predict(rf_model, newdata = merge_data_test)
@@ -175,10 +157,12 @@ print(confusion_matrix)
 print(accuracy)
 ```
 
+No output observámos que a accuracy deste modelo é de 0.848484, ou seja 84%.
 
-## Kagle
+<!-- load packagers 
+## Kaggle -->
 
-```{r include=FALSE}
+```{r eval=FALSE, include=FALSE}
 new_column_names <- c("client_id", "district_id", "have_card", "gender_F", "birth_day", "loan_id", "account_id",
                       "date", "amount", "duration", "payments", "money_in_account", "age", "average_salary")
 
@@ -186,7 +170,7 @@ colnames(merge_data1) <- new_column_names
 rm(new_column_names)
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 predicted_probabilities <- predict(rf_model, newdata = merge_data1, type = "prob")
 acceptance_percentage <- predicted_probabilities[, "1"] * 100 
 rejection_percentage <- 100 - acceptance_percentage
@@ -194,4 +178,11 @@ final_kaggle <- data.frame(Id = merge_data1$loan_id, Predicted = rejection_perce
 write.csv(final_kaggle, file = "final_kaggle.csv", row.names = FALSE)
 ```
 
+
+## Modelo escolhido
+
+O R-squared do modelo de regressão linear é bastante baixo, indicando que o modelo explica apenas uma pequena proporção da variação na variável de resposta.
+O modelo de random forest tem maior exatidão, precisão e recuperação, o que sugere um melhor desempenho global de classificação em comparação com o modelo de regressão linear.
+
+Com base nos resultados escolhemos o modelo random forest.
 

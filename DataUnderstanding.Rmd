@@ -236,7 +236,7 @@ O tipo classic é o tipo com mais quantidade dos 3 tipos.
 
 Emissão de diferentes tipos de cartões ao longo do tempo grafico linear para cenas com tempo
 
-```{r}
+```{r include=FALSE}
 card_dev$issued <- as.Date(as.character(card_dev$issued), format = "%y%m%d")
 ```
 
@@ -325,51 +325,3 @@ ggplot(district, aes(x = region, y = `no. of commited crimes '95`, fill = region
 ```
 
 Dos dois últimos gráfico retiramos que Prague é a maior região com criminalidade, mas em contra partida também é a região com o maior número de habitantes.
-
-# Predictive Modelling
-
-DECISION TREES
-
-Decision tree inicial, sem trainnig e test
-
-```{r include=FALSE}
-selected_columns <- loan_dev %>%
-    select(account_id, status,date)
-```
-
-```{r include=FALSE}
-merge_loan_disp <- merge(selected_columns, disp, by = "account_id")
-```
-
-Calcular a idade do cliente quando fez o loan
-```{r include=FALSE}
-selected_columns1 <- merge_loan_disp %>%
-    select(client_id,date,status)
-
-merge_loan_client <- merge(selected_columns1, client, by = "client_id")
-```
-
-```{r include=FALSE}
-merge_loan_client$birth_number <- as.character(merge_loan_client$birth_number)
-merge_loan_client$birth_year <- as.numeric(substr(merge_loan_client$birth_number, 1, 2))
-merge_loan_client$date <- as.character(merge_loan_client$date)
-merge_loan_client$loan_year <- as.numeric(substr(merge_loan_client$date, 1, 2))
-merge_loan_client$age <- (1900 + merge_loan_client$loan_year) - (1900 + merge_loan_client$birth_year)  # Adjust for the two-digit year
-```
-
-```{r include=FALSE}
-selected_columns2 <- merge_loan_client %>%
-     select(age,status,district_id)
-```
-
-```{r}
-model_rt <- decision_tree(mode = "regression", engine = "rpart") 
-rt_fit <- model_rt %>% 
-  fit(status ~ ., data = selected_columns2)
-
-rt_fit %>%
-  extract_fit_engine() %>%
-    rpart.plot(roundint = FALSE)
-
-vip(rt_fit)
-```
