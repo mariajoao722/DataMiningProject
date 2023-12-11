@@ -1,0 +1,132 @@
+---
+title: "Predictive Modelling"
+author: "Maria Pais, Mónica Araújo"
+date: "2023-11-07"
+output:
+  html_document:
+    number_sections: yes
+    theme: flatly  # journal flatly spacelab cosmo
+    highlight: tango
+    toc : yes
+    toc_float:
+      collapsed: true
+      smoth_scroll: true
+  word_document: 
+    toc :yes
+  pdf_document:
+    toc : yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+<!-- load packagers -->
+
+<!-- include = false is for Hiding the code and the output in final file-->
+
+```{r, include = FALSE}
+library(tidyverse)
+library(tidymodels)
+library(dplyr)
+library(vip)
+library(rpart.plot)
+#install.packages("randomForest")
+library(randomForest)
+```
+
+# Load Data
+
+The data is already preprocessed in the DataPreparation step. The result is save in a RData file. 
+
+```{r load_data, echo=TRUE}
+# train dataset
+load("Rdata/train/merge_data_train.Rdata")
+
+# test dataset
+load("Rdata/test/merge_data_test.Rdata")
+
+load("Rdata/merge_data.Rdata")
+
+load("merge_data_kagle.Rdata")
+```
+
+
+# Predictive Modelling
+
+## Decision Trees
+
+```{r}
+selected_columns2 <- merge_data %>%
+     select(age,status,district_id,have_card,`average salary`)
+
+selected_columns2$status <- as.integer(selected_columns2$status)
+```
+
+```{r}
+model_rt <- decision_tree(mode = "regression", engine = "rpart") 
+rt_fit <- model_rt %>% 
+  fit(status ~ ., data = selected_columns2)
+
+rt_fit %>%
+  extract_fit_engine() %>%
+    rpart.plot(roundint = FALSE)
+
+vip(rt_fit)
+```
+
+## Linear Regression
+
+```{r}
+# Create a linear regression model
+linear_model <- lm(status ~ age, data = merge_data_train)
+
+# Print the summary of the model
+summary(linear_model)
+
+predictions <- predict(linear_model, newdata = merge_data_test)
+
+# Print or further analyze the predictions
+print(predictions)
+```
+
+
+## Random Forest
+
+```{r}
+# Convert status to a factor
+merge_data_train$status <- as.factor(merge_data_train$status)
+
+# Build Random Forest classification model
+rf_model <- randomForest(status ~ age + district_id + gender_F + money_in_account, data = merge_data_train)
+
+predictions <- predict(rf_model, newdata = merge_data_test)
+```
+
+```{r}
+confusion_matrix <- table(predictions, merge_data_test$status)
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+
+# Print the confusion matrix
+print(confusion_matrix)
+
+print(accuracy)
+```
+
+
+## Kagle
+
+```{r}
+predicted_probabilities <- predict(rf_model, newdata = merge_data_kagle, type = "prob")
+acceptance_percentage <- predicted_probabilities[, "1"] * 100 
+rejection_percentage <- 100 - acceptance_percentage
+final_kaggle <- data.frame(loan_id = merge_data_kagle$loan_id, rejection_percentage)
+print(acceptance_percentage)
+print(rejection_percentage)
+```
+
+
