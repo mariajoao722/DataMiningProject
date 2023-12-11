@@ -40,19 +40,19 @@ library(caret)
 <!-- load the databases -->
 ```{r, include = FALSE}
 # Load or create the loan_dev dataset
-loan_dev <- read_delim("Rdata/kagel/loan_comp.csv", delim = ";", 
+loan_dev <- read_delim("loan_dev.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
 
 disp <- read_delim("disp.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
 
-trans_dev <- read_delim("Rdata/kagel/trans_comp.csv", delim = ";", 
+trans_dev <- read_delim("trans_dev.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
 
 account <- read_delim("account.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
 
-card_dev <- read_delim("Rdata/kagel/card_comp.csv", delim = ";", 
+card_dev <- read_delim("card_dev.csv", delim = ";", 
     escape_double = FALSE, trim_ws = TRUE)
 
 client <- read_delim("client.csv", delim = ";", 
@@ -577,7 +577,7 @@ merge_data <- loan_dev_transform %>%
             ) %>%
   select(
     client_id, district_id, have_card, gender_F, birth_day,
-    loan_id, account_id, date, amount, duration, payments, money_in_account, age
+    loan_id, account_id, date, amount, duration, status, payments, money_in_account, age
   ) %>%
   mutate(district_id = as.integer(district_id)) %>%
   left_join(district_average_salary,
