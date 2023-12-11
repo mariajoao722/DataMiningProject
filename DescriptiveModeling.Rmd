@@ -151,12 +151,53 @@ c <- cutree(hclust.sing, k = 3)
 
 si_coefs_hclust_sing_3 <- silhouette(c, dm)
 fviz_silhouette(si_coefs_hclust_sing_3)
-
 ```
 
-# Results and Interpretation
+### Complete Link
 
-# Visualizations
+````{r}
+hclust.sing <- hclust(dm, "complete")
+fviz_dend(hclust.sing, k = 3)
+c <- cutree(hclust.sing, k = 3)
+
+si_coefs_hclust_sing_3 <- silhouette(c, dm)
+fviz_silhouette(si_coefs_hclust_sing_3)
+```
+
+
+### Average Link
+
+````{r}
+hclust.sing <- hclust(dm, "average")
+fviz_dend(hclust.sing, k = 3)
+c <- cutree(hclust.sing, k = 3)
+
+si_coefs_hclust_sing_3 <- silhouette(c, dm)
+fviz_silhouette(si_coefs_hclust_sing_3)
+```
+
+## Divisive Method
+
+`````{r}
+
+divisive_clustering <- diana(two_columns)
+
+pltree(divisive_clustering, cex=0.8, hang =-1, main = "Divisive Hierarchical Clustering")
+
+num_clusters <- 3
+clusters_divisive <- cutree(divisive_clustering, k = num_clusters)
+
+df <- data.frame(data, Cluster = as.factor(clusters_divisive))
+
+plot(data, col = clusters_divisive, pch = 16, main = "Divisive Hierarchical Clustering",
+     xlab = names(two_columns)[1], ylab = names(two_columns)[2])
+
+legend("topright", legend = levels(df$Cluster), col = 1:num_clusters, pch = 16, title = "Clusters")
+
+````
+
+
+# Results and Interpretation
 
 # Conclusion
 
