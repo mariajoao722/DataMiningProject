@@ -64,7 +64,7 @@ district <- read_delim("district.csv", delim = ";",
 ```
 
 
-# Data Preparation Mónica
+# Data Preparation
 
 ## Conversão do tipo de dados (Data Structure) 
 
@@ -553,8 +553,6 @@ rm(disp_temp2, age_loan)
 ````
 
 
-
-
 Juntar tudo o que foi considerado importante para a analise num dataset
 
 ````{r}
@@ -568,6 +566,9 @@ disp_temp <- disp_transform %>%
   filter(`type: OWNER` == "1") %>%
   select(-`type: DISPONENT`, -`type: OWNER`)
 
+select_columns <- c(names(client_transform), names(loan_dev_transform))
+print(select_columns)
+
 merge_data <- loan_dev_transform %>%
   left_join(disp_temp, 
             by = "account_id",
@@ -575,10 +576,7 @@ merge_data <- loan_dev_transform %>%
    left_join(client_transform, 
             by = "client_id",
             ) %>%
-  select(
-    client_id, district_id, have_card, gender_F, birth_day,
-    loan_id, account_id, date, amount, duration, status, payments, money_in_account, age
-  ) %>%
+  select(select_columns) %>%
   mutate(district_id = as.integer(district_id)) %>%
   left_join(district_average_salary,
             by="district_id")
