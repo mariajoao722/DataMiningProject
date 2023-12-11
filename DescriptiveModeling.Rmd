@@ -35,6 +35,7 @@ library(factoextra)
 library(dbscan)
 library(factoextra)
 library(fpc)
+library(stringr)
 
 ```
 
@@ -54,11 +55,27 @@ load("Rdata/test/merge_data_test.Rdata")
 
 # Clustering
 
-Criaçao do dataset das 2 colunas que vou analisar
+Criação do dataset das 2 colunas que vou analisar
 ```{r}
 two_columns <- merge_data_train %>%
-              select(loan_id, amount)
+              select(district_id, amount)
+
+district_region <- district_transform_train %>%
+                    select(code, `region: central Bohemia`, `region: east Bohemia`, `region: north Bohemia`, `region: north Moravia`, `region: Prague`, `region: south Bohemia`, `region: south Moravia`, `region: west Bohemia`)
 ````
+
+
+````{r}
+colunas <- district %>%
+                    select( code, region) %>%
+  mutate(region = as.factor(region)) %>%
+  mutate(district_id = code) %>%
+  select(-code)
+  
+two_columns_with_region <- merge(two_columns, colunas)
+
+
+`````
 
 ## k-means
 
@@ -117,8 +134,9 @@ plot(k_values, wss_values, type = "b", pch = 19, frame = FALSE,
      xlab = "Number of Clusters (k)", ylab = "Total Within Sum of Squares",
      main = "Elbow Method")
 
-# inserir manualmente o valor do elbow de acordo 
-elbow_point <- 4
+wss_diff <- diff(wss_values)
+elbow_point <- which.max(wss_diff)
+
 abline(v = elbow_point, col = "red", lty = 2)
 cat("Optimal Number of Clusters:", elbow_point, "\n")
 
@@ -199,7 +217,6 @@ legend("topright", legend = levels(df$Cluster), col = 1:num_clusters, pch = 16, 
 
 # Results and Interpretation
 
-# Conclusion
 
 
 

@@ -370,22 +370,12 @@ print(sum(duplicate_rows))
 
 
 ````
-## Handle errors in data
 
-
-````{r}
-account$account_id <- as.integer(account$account_id)
-account$district_id <- as.factor(account$district_id)
-str(account)
-summary(account)
-boxplot(account$date)
-hist(account$date, breaks = "months", xlab="Date by months", ylab = "density", main = "Histogram of dates")
-````
 
 ## Encoding categorical variables
 
-\\ indicar a preseça do cartao bancario (ou nao) no client
-\\ consideramos que o client so tem cartao se for o owner da conta
+Indicar a preseça do cartao bancario (ou nao) no client
+Consideramos que o client so tem cartão se for o owner da conta
 
 ````{r}
 
@@ -630,8 +620,6 @@ rm(datasets)
 // Feature scaling is a preprocessing step that aims to standardize or normalize the range of independent variables or features of a dataset
 
 Standardization (Z-score normalization)
-
-todo: district_transformation maybe need other thing than on-hot encoding
 
 ````{r}
 

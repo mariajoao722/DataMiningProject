@@ -4,3 +4,4 @@
 .RData
 trashbin.txt
 .*
+*.html
