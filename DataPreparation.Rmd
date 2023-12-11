@@ -797,16 +797,16 @@ save(district_name, file="Rdata/district_name.Rdata")
 save(merge_data, file="Rdata/merge_data.Rdata")
 
 
-#save train datasets
-#save(account_transform_train, file="Rdata/train/account_train.Rdata")
-#save(card_dev_transform_train, file="Rdata/train/card_dev_train.Rdata")
-#save(client_transform_train, file="Rdata/train/client_train.Rdata")
-#save(disp_transform_train, file="Rdata/train/disp_train.Rdata")
-#save(district_transform_train, file="Rdata/train/district_train.RData")
-#save(loan_dev_transform_train, file="Rdata/train/loan_dev_train.Rdata")
-#save(trans_dev_transform_train, file="Rdata/train/trans_dev_train.Rdata")
-#save(trans_dev_operation_transform_train, file="Rdata/train/trans_dev_operation_train.Rdata")
-#save(district_name_transform_train, file="Rdata/train/district_name_train.Rdata")
+save train datasets
+save(account_transform_train, file="Rdata/train/account_train.Rdata")
+save(card_dev_transform_train, file="Rdata/train/card_dev_train.Rdata")
+save(client_transform_train, file="Rdata/train/client_train.Rdata")
+save(disp_transform_train, file="Rdata/train/disp_train.Rdata")
+save(district_transform_train, file="Rdata/train/district_train.RData")
+save(loan_dev_transform_train, file="Rdata/train/loan_dev_train.Rdata")
+save(trans_dev_transform_train, file="Rdata/train/trans_dev_train.Rdata")
+save(trans_dev_operation_transform_train, file="Rdata/train/trans_dev_operation_train.Rdata")
+save(district_name_transform_train, file="Rdata/train/district_name_train.Rdata")
 save(merge_data_train, file="Rdata/train/merge_data_train.Rdata")
 
 
