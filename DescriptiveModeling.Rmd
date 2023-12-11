@@ -30,7 +30,12 @@ knitr::opts_chunk$set(
 ```{r, include = FALSE}
 library(tidyverse)
 library(tidymodels)
-library(dplyr)
+library(cluster)
+library(factoextra)
+library(dbscan)
+library(factoextra)
+library(fpc)
+
 ```
 
 # Load Data
@@ -47,9 +52,113 @@ load("Rdata/test/merge_data_test.Rdata")
 `````
 
 
+# Clustering
 
+Criaçao do dataset das 2 colunas que vou analisar
+```{r}
+two_columns <- merge_data_train %>%
+              select(loan_id, amount)
+````
 
+## k-means
 
+### Metodo sem Clustering Validation
+````{r}
+k <- 3
+kmeans_result <- kmeans(two_columns, centers = k)
+cluster_assignments <- kmeans_result$cluster
+centroids <- kmeans_result$centers
+
+# Visualize clusters using fviz_cluster
+fviz_cluster(kmeans_result, data = two_columns, geom = "point", stand = FALSE,
+             ellipse.type = "convex", ellipse.level = 0.95, main = "K-Means Clustering (k=3)")
+
+```
+### Silhouette Coefficient
+
+````{r}
+
+calculate_avg_silhouette <- function(k, data) {
+  kmeans_result <- kmeans(data, centers = k)
+  silhouette_width <- cluster.stats(dist(data), kmeans_result$cluster)$avg.silwidth
+  return(silhouette_width)
+}
+
+k_values <- 2:6
+avg_silhouette_values <- sapply(k_values, function(k) calculate_avg_silhouette(k, two_columns))
+
+plot(k_values, avg_silhouette_values, type = "b", pch = 19, frame = FALSE,
+     xlab = "Number of Clusters (k)", ylab = "Silhouette Coefficient Width",
+     main = "Silhouette Coefficient")
+
+optimal_k <- k_values[which.max(avg_silhouette_values)]
+abline(v = optimal_k, col = "red", lty = 2)
+cat("Optimal Number of Clusters:", optimal_k, "\n")
+
+optimal_kmeans <- kmeans(two_columns, centers = optimal_k)
+
+fviz_cluster(optimal_kmeans, data = as.data.frame(two_columns), geom = "point", stand = FALSE, ellipse.type = "convex", ellipse.level = 0.95, main = paste("K-Means Clustering (k =", optimal_k, ") - Silhouette method"))
+```
+
+### Elbow Method
+
+````{r}
+set.seed(2023)
+
+calculate_wss <- function(k, data) {
+  kmeans_result <- kmeans(data, centers = k)
+  return(sum(kmeans_result$withinss))
+}
+
+k_values <- 2:10
+wss_values <- sapply(k_values, function(k) calculate_wss(k, two_columns))
+
+plot(k_values, wss_values, type = "b", pch = 19, frame = FALSE,
+     xlab = "Number of Clusters (k)", ylab = "Total Within Sum of Squares",
+     main = "Elbow Method")
+
+# inserir manualmente o valor do elbow de acordo 
+elbow_point <- 4
+abline(v = elbow_point, col = "red", lty = 2)
+cat("Optimal Number of Clusters:", elbow_point, "\n")
+
+optimal_kmeans <- kmeans(two_columns, centers = elbow_point)
+
+fviz_cluster(optimal_kmeans, data = as.data.frame(two_columns), geom = "point", stand = FALSE, ellipse.type = "convex", ellipse.level = 0.95, main = paste("K-Means Clustering (k =", elbow_point, ") - Elbow method"))
+````
+## DBSCAN
+
+````{r}
+dbscan_result <- dbscan(two_columns, eps = 0.5, MinPts = 10)
+
+fviz_cluster(dbscan_result, data = as.data.frame(two_columns), stand = FALSE, ellipse.type = "convex", ellipse.level = 0.95, main = "DBSCAN Clustering")
+
+```
+
+## hierarchical clustering
+
+### Agglomerative method
+
+````{r}
+dm <- dist(two_columns)
+````
+
+#### Single Link
+````{r}
+hclust.sing <- hclust(dm, "single")
+fviz_dend(hclust.sing, k = 3)
+c <- cutree(hclust.sing, k = 3)
+
+si_coefs_hclust_sing_3 <- silhouette(c, dm)
+fviz_silhouette(si_coefs_hclust_sing_3)
+
+```
+
+# Results and Interpretation
+
+# Visualizations
+
+# Conclusion
 
 
 
