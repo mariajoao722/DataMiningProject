@@ -552,9 +552,12 @@ client_transform <- client_transform %>%
 Calcular a idade do cliente quando fez a loan
 
 ```{r}
+disp_temp2 <- disp_transform %>%
+  filter(`type: OWNER` == "1") %>%
+  select(-`type: DISPONENT`, -`type: OWNER`)
 
 age_loan <- loan_dev_transform %>%
-  left_join(disp_transform, 
+  left_join(disp_temp2, 
             by = "account_id",
             ) %>%
    left_join(client_transform, 
@@ -567,11 +570,13 @@ loan_dev_transform <- loan_dev_transform %>%
   left_join(age_loan, 
             by= "loan_id")
 
-rm(age_loan)
+rm(disp_temp2, age_loan)
 ````
 
 
-Juntar tudo o importante num dataset
+
+
+Juntar tudo o que foi considerado importante para a analise num dataset
 
 ````{r}
 
@@ -580,8 +585,12 @@ district_average_salary <- district_transform %>%
   mutate(district_id = code) %>%
   select(-code)
 
+disp_temp <- disp_transform %>%
+  filter(`type: OWNER` == "1") %>%
+  select(-`type: DISPONENT`, -`type: OWNER`)
+
 merge_data <- loan_dev_transform %>%
-  left_join(disp_transform, 
+  left_join(disp_temp, 
             by = "account_id",
             ) %>%
    left_join(client_transform, 
@@ -597,8 +606,6 @@ merge_data <- loan_dev_transform %>%
 
 ```
 
-## Dimensionality redution
-//todo
 
 ## Data splitting
 
@@ -782,7 +789,6 @@ rm(features_merge, mean_values, standerd_deviation_values)
 ````
 
 
-
 ## Save
 ````{r}
 save(account_transform, file="Rdata/account.Rdata")
@@ -797,7 +803,7 @@ save(district_name, file="Rdata/district_name.Rdata")
 save(merge_data, file="Rdata/merge_data.Rdata")
 
 
-save train datasets
+#save train datasets
 save(account_transform_train, file="Rdata/train/account_train.Rdata")
 save(card_dev_transform_train, file="Rdata/train/card_dev_train.Rdata")
 save(client_transform_train, file="Rdata/train/client_train.Rdata")
