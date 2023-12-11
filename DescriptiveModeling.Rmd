@@ -218,7 +218,18 @@ legend("topright", legend = levels(df$Cluster), col = 1:num_clusters, pch = 16, 
 # Results and Interpretation
 
 
+Ao abordar a escolha das duas colunas para análise, nosso objetivo foi compreender de que maneira o distrito de origem pode influenciar o montante de dinheiro emprestado em empréstimos. A seleção cuidadosa das variáveis "district_id" e "amount" visou explorar as relações entre o local de residência dos tomadores de empréstimos e os valores financeiros associados.
 
+Ao investigar essas colunas, buscamos identificar padrões e tendências que podem indicar como fatores geográficos específicos, representados pelo "district_id", estão correlacionados com os montantes de empréstimos. Essa análise visa proporcionar insights valiosos sobre possíveis disparidades regionais nos padrões de empréstimos, oferecendo uma compreensão mais profunda do impacto do contexto geográfico nas transações de empréstimos.
 
+Ao apresentar os resultados desta análise, destacaremos observações significativas e conclusões que surgiram da relação entre o distrito de origem e os valores de empréstimos. Este processo proporcionará uma visão aprimorada dos dados, permitindo uma análise mais contextualizada das nuances geográficas presentes.
+
+No methodo algomerative Hierarchical podemos ver que nao importa o method do link nao tem diferenças significativas, ainda principalmente entre o methodo complete link e average link
+
+No contexto do DBSCAN, enfrentamos desafios na representação gráfica que proporcionasse uma compreensão clara e relevante das informações. O DBSCAN é conhecido por sua sensibilidade à densidade e pela capacidade de identificar áreas de baixa densidade como ruído. No entanto, a natureza dos dados pode dificultou a visualização eficaz por meio de gráficos.
+
+Essa constatação sugere que, no contexto da nossa análise, a escolha entre single link, Complete Link e Average Link no processo Hierárquico Aglomerativo não ter um impacto substancial na estrutura dos clusters. Essa observação é crucial para entendermos a robustez das relações identificadas, indicando que, independentemente do método de ligação escolhido, as conclusões obtidas sobre a formação de clusters são consistentes.
+
+Ao apresentar essa análise, focaremos em destacar a estabilidade e consistência dos resultados em diferentes abordagens do método Hierárquico Aglomerativo.
 
 
